@@ -1,0 +1,206 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CrowdSphere Design System - Dark Neon Nightlife Theme */
+
+@layer base {
+  :root {
+    /* Dark charcoal base */
+    --background: 215 25% 5%;
+    --foreground: 0 0% 98%;
+
+    /* Glassmorphism cards */
+    --card: 215 25% 8%;
+    --card-foreground: 0 0% 95%;
+    --card-border: 215 20% 15%;
+
+    /* Neon accents */
+    --neon-pink: 312 100% 61%;
+    --neon-blue: 203 100% 61%;
+    --neon-lime: 76 100% 51%;
+
+    /* Primary (Neon Pink) */
+    --primary: 312 100% 61%;
+    --primary-foreground: 0 0% 5%;
+    --primary-glow: 312 100% 80%;
+
+    /* Secondary (Electric Blue) */
+    --secondary: 203 100% 61%;
+    --secondary-foreground: 0 0% 5%;
+    --secondary-glow: 203 100% 80%;
+
+    /* Success (Lime) */
+    --success: 76 100% 51%;
+    --success-foreground: 0 0% 5%;
+
+    /* Crowd level badges */
+    --crowd-quiet: 142 76% 36%;
+    --crowd-moderate: 45 93% 47%;
+    --crowd-busy: 0 84% 60%;
+    --crowd-none: 215 20% 40%;
+
+    /* UI states */
+    --muted: 215 20% 15%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 215 20% 20%;
+    --accent-foreground: 0 0% 90%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 215 20% 15%;
+    --input: 215 20% 12%;
+    --ring: 312 100% 61%;
+
+    --radius: 1.5rem;
+
+    /* Gradients */
+    --gradient-neon: linear-gradient(135deg, hsl(var(--neon-pink)), hsl(var(--neon-blue)));
+    --gradient-glow: linear-gradient(135deg, hsl(var(--primary-glow) / 0.3), hsl(var(--secondary-glow) / 0.3));
+    --gradient-card: linear-gradient(135deg, hsl(var(--card) / 0.8), hsl(var(--card) / 0.4));
+
+    /* Shadows & glows */
+    --glow-primary: 0 0 20px hsl(var(--primary) / 0.3);
+    --glow-secondary: 0 0 20px hsl(var(--secondary) / 0.3);
+    --glow-success: 0 0 20px hsl(var(--success) / 0.3);
+    --shadow-glass: 0 8px 32px hsl(215 25% 3% / 0.4);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  /* Glassmorphism utilities */
+  .glass-card {
+    @apply backdrop-blur-md border border-card-border/50;
+    background: linear-gradient(135deg, hsl(var(--card) / 0.9), hsl(var(--card) / 0.7));
+    box-shadow: var(--shadow-glass);
+  }
+
+  .glass-light {
+    @apply backdrop-blur-sm border border-card-border/30;
+    background: linear-gradient(135deg, hsl(var(--card) / 0.6), hsl(var(--card) / 0.4));
+  }
+
+  /* Fix transparent text backgrounds */
+  .text-bg-solid {
+    background: hsl(var(--card) / 0.95);
+    backdrop-filter: blur(8px);
+  }
+
+  .badge-bg-solid {
+    background: hsl(var(--card) / 0.9);
+    backdrop-filter: blur(4px);
+  }
+
+  /* Neon glow effects */
+  .glow-primary {
+    box-shadow: var(--glow-primary);
+  }
+
+  .glow-secondary {
+    box-shadow: var(--glow-secondary);
+  }
+
+  .glow-success {
+    box-shadow: var(--glow-success);
+  }
+
+  /* Pulse animation for live content */
+  .pulse-neon {
+    animation: pulse-neon 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-neon {
+    0%, 100% {
+      box-shadow: 0 0 5px hsl(var(--primary) / 0.5);
+    }
+    50% {
+      box-shadow: 0 0 20px hsl(var(--primary) / 0.8), 0 0 30px hsl(var(--primary) / 0.4);
+    }
+  }
+
+  /* Smooth transitions */
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+
+  .transition-bounce {
+    transition: var(--transition-bounce);
+  }
+
+  /* Futuristic music button animations */
+  .music-button-glow {
+    animation: music-glow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes music-glow {
+    0% {
+      box-shadow: 0 0 5px hsl(var(--neon-cyan) / 0.3);
+    }
+    100% {
+      box-shadow: 0 0 20px hsl(var(--neon-cyan) / 0.6), 0 0 30px hsl(var(--neon-cyan) / 0.3);
+    }
+  }
+
+  .music-button-pulse {
+    animation: music-pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes music-pulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 0.8;
+    }
+  }
+
+  .music-button-rotate {
+    animation: music-rotate 4s linear infinite;
+  }
+
+  @keyframes music-rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Scan line animation for music button */
+  @keyframes scan {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
