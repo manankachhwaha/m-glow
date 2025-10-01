@@ -18,6 +18,12 @@ export const useAudio = () => {
     }
   }, []);
 
+  // Function to enable music (called when auto-playing on auth screen)
+  const enableMusic = () => {
+    setIsMusicEnabled(true);
+    localStorage.setItem('music-enabled', 'true');
+  };
+
   const toggleMusic = () => {
     const newState = !isMusicEnabled;
     setIsMusicEnabled(newState);
@@ -39,6 +45,7 @@ export const useAudio = () => {
   return {
     isMusicEnabled,
     toggleMusic,
+    enableMusic,
     playButtonClick,
   };
 };

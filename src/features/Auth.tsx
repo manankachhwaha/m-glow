@@ -1,9 +1,11 @@
 // Authentication Screen with Real Logos
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MapPin, Smartphone, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { GoogleSignInButton, AppleSignInButton, FacebookSignInButton, SocialLogin } from '@/components/AuthComponents';
+import { playBackgroundMusic } from '@/utils/audio';
+import { useAudio } from '@/hooks/use-audio';
 
 interface AuthProps {
   onAuth: () => void;
@@ -11,6 +13,23 @@ interface AuthProps {
 
 export function Auth({ onAuth }: AuthProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const { enableMusic } = useAudio();
+
+  // Auto-play music when user reaches auth screen
+  useEffect(() => {
+    const startMusic = async () => {
+      try {
+        console.log('🎵 Auto-playing music on auth screen...');
+        await playBackgroundMusic();
+        // Enable music state so the toggle button shows correct state
+        enableMusic();
+      } catch (error) {
+        console.log('🎵 Music autoplay failed (user interaction may be required):', error);
+      }
+    };
+
+    startMusic();
+  }, [enableMusic]);
 
   const handleAuth = async (provider: 'apple' | 'google' | 'email') => {
     setIsLoading(true);
