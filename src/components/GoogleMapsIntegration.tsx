@@ -5,6 +5,14 @@ import { Search, MapPin, Star, Clock, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MAPS_CONFIG, isGoogleMapsConfigured, getGoogleMapsScriptUrl } from '@/config/maps';
 
+// Google Maps type declarations
+declare global {
+  interface Window {
+    google: any;
+  }
+  const google: any;
+}
+
 interface GoogleMapsIntegrationProps {
   onPlaceSelect?: (place: PlaceResult) => void;
   className?: string;
@@ -16,7 +24,7 @@ interface PlaceResult {
   formatted_address: string;
   rating: number;
   price_level?: number;
-  photos?: google.maps.places.PlacePhoto[];
+  photos?: any[];
   opening_hours?: {
     open_now: boolean;
   };
@@ -30,8 +38,8 @@ export function GoogleMapsIntegration({ onPlaceSelect, className }: GoogleMapsIn
   const [selectedPlace, setSelectedPlace] = useState<PlaceResult | null>(null);
   const [isConfigured, setIsConfigured] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [service, setService] = useState<google.maps.places.PlacesService | null>(null);
+  const [map, setMap] = useState<any>(null);
+  const [service, setService] = useState<any>(null);
 
   // Check if Google Maps is properly configured
   useEffect(() => {
@@ -86,9 +94,9 @@ export function GoogleMapsIntegration({ onPlaceSelect, className }: GoogleMapsIn
         radius: MAPS_CONFIG.SEARCH_RADIUS
       };
 
-      service.textSearch(request, (results, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-          const places: PlaceResult[] = results.map((place: google.maps.places.PlaceResult) => ({
+      service.textSearch(request, (results: any, status: any) => {
+        if (status === 'OK' && results) {
+          const places: PlaceResult[] = results.map((place: any) => ({
             place_id: place.place_id,
             name: place.name,
             formatted_address: place.formatted_address,
@@ -119,8 +127,8 @@ export function GoogleMapsIntegration({ onPlaceSelect, className }: GoogleMapsIn
         fields: ['geometry']
       };
       
-      service?.getDetails(request, (result, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && result?.geometry?.location) {
+      service?.getDetails(request, (result: any, status: any) => {
+        if (status === 'OK' && result?.geometry?.location) {
           map.setCenter(result.geometry.location);
           map.setZoom(16);
         }
