@@ -37,9 +37,9 @@ export function VenueCard({
     >
       {/* Hero Image */}
       <div className="relative h-48 overflow-hidden">
-        {(heroImage || (venue as any).hero_image) ? (
+        {(heroImage || (venue as Venue & { hero_image?: string }).hero_image) ? (
           <img
-            src={heroImage || (venue as any).hero_image}
+            src={heroImage || (venue as Venue & { hero_image?: string }).hero_image}
             alt={venue.name}
             className="w-full h-full object-cover transition-smooth group-hover:scale-105"
           />

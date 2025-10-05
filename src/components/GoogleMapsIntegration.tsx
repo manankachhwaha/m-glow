@@ -1,11 +1,12 @@
 // Google Maps Integration Component
 
 import { useState, useEffect, useRef } from 'react';
-import { Search, MapPin, Star, Clock } from 'lucide-react';
+import { Search, MapPin, Star, Clock, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { MAPS_CONFIG, isGoogleMapsConfigured, getGoogleMapsScriptUrl } from '@/config/maps';
 
 interface GoogleMapsIntegrationProps {
-  onPlaceSelect?: (place: any) => void;
+  onPlaceSelect?: (place: PlaceResult) => void;
   className?: string;
 }
 
@@ -15,7 +16,7 @@ interface PlaceResult {
   formatted_address: string;
   rating: number;
   price_level?: number;
-  photos?: any[];
+  photos?: google.maps.places.PlacePhoto[];
   opening_hours?: {
     open_now: boolean;
   };
@@ -27,44 +28,24 @@ export function GoogleMapsIntegration({ onPlaceSelect, className }: GoogleMapsIn
   const [searchResults, setSearchResults] = useState<PlaceResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState<PlaceResult | null>(null);
+  const [isConfigured, setIsConfigured] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [service, setService] = useState<google.maps.places.PlacesService | null>(null);
+
+  // Check if Google Maps is properly configured
+  useEffect(() => {
+    setIsConfigured(isGoogleMapsConfigured());
+  }, []);
 
   // Initialize Google Maps
   useEffect(() => {
     const initMap = () => {
       if (mapRef.current && !map) {
         const mapInstance = new google.maps.Map(mapRef.current, {
-          center: { lat: 19.0760, lng: 72.8777 }, // Mumbai coordinates
+          center: MAPS_CONFIG.DEFAULT_CENTER,
           zoom: 13,
-          styles: [
-            {
-              featureType: 'all',
-              elementType: 'geometry',
-              stylers: [{ color: '#1a1a1a' }]
-            },
-            {
-              featureType: 'all',
-              elementType: 'labels.text.fill',
-              stylers: [{ color: '#00ff88' }]
-            },
-            {
-              featureType: 'all',
-              elementType: 'labels.text.stroke',
-              stylers: [{ color: '#000000' }]
-            },
-            {
-              featureType: 'poi',
-              elementType: 'geometry',
-              stylers: [{ color: '#2d2d2d' }]
-            },
-            {
-              featureType: 'poi',
-              elementType: 'labels.text.fill',
-              stylers: [{ color: '#00ff88' }]
-            }
-          ]
+          styles: MAPS_CONFIG.DARK_STYLE
         });
 
         const placesService = new google.maps.places.PlacesService(mapInstance);
@@ -73,18 +54,24 @@ export function GoogleMapsIntegration({ onPlaceSelect, className }: GoogleMapsIn
       }
     };
 
+    // Only initialize if Google Maps is configured
+    if (!isConfigured) return;
+
     // Load Google Maps script if not already loaded
     if (!window.google) {
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places`;
+      script.src = getGoogleMapsScriptUrl();
       script.async = true;
       script.defer = true;
       script.onload = initMap;
+      script.onerror = () => {
+        console.error('Failed to load Google Maps script');
+      };
       document.head.appendChild(script);
     } else {
       initMap();
     }
-  }, []);
+  }, [isConfigured, map]);
 
   // Search for places
   const searchPlaces = async () => {
@@ -95,13 +82,13 @@ export function GoogleMapsIntegration({ onPlaceSelect, className }: GoogleMapsIn
       const request = {
         query: searchQuery,
         fields: ['place_id', 'name', 'formatted_address', 'rating', 'price_level', 'photos', 'opening_hours', 'types'],
-        locationBias: new google.maps.LatLng(19.0760, 72.8777), // Mumbai
-        radius: 50000 // 50km radius
+        locationBias: new google.maps.LatLng(MAPS_CONFIG.DEFAULT_CENTER.lat, MAPS_CONFIG.DEFAULT_CENTER.lng),
+        radius: MAPS_CONFIG.SEARCH_RADIUS
       };
 
       service.textSearch(request, (results, status) => {
         if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-          const places: PlaceResult[] = results.map((place: any) => ({
+          const places: PlaceResult[] = results.map((place: google.maps.places.PlaceResult) => ({
             place_id: place.place_id,
             name: place.name,
             formatted_address: place.formatted_address,
@@ -153,6 +140,37 @@ export function GoogleMapsIntegration({ onPlaceSelect, className }: GoogleMapsIn
     if (!level) return '';
     return '₹'.repeat(level);
   };
+
+  // Show configuration warning if not set up
+  if (!isConfigured) {
+    return (
+      <div className={cn('w-full h-full flex flex-col items-center justify-center', className)}>
+        <div className="glass-card rounded-3xl p-8 text-center max-w-md">
+          <AlertCircle className="w-16 h-16 text-neon-orange mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-white mb-4">Google Maps Setup Required</h3>
+          <div className="text-sm text-muted-foreground space-y-2 text-left">
+            <p>To use Google Maps integration:</p>
+            <ol className="list-decimal list-inside space-y-1 ml-4">
+              <li>Get an API key from <span className="text-neon-cyan">Google Cloud Console</span></li>
+              <li>Enable Maps JavaScript API & Places API</li>
+              <li>Add your API key to environment variables</li>
+              <li>Set <code className="text-neon-lime">VITE_GOOGLE_MAPS_API_KEY</code></li>
+            </ol>
+          </div>
+          <div className="mt-6">
+            <a 
+              href="https://console.cloud.google.com/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-block px-6 py-3 bg-primary text-primary-foreground rounded-xl hover:bg-primary/80 transition-all duration-300"
+            >
+              Get API Key
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={cn('w-full h-full flex flex-col', className)}>

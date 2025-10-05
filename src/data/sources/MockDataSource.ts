@@ -93,7 +93,8 @@ const SEED_VENUES: Venue[] = [
     phone: '+91 98765 43214',
     tz: 'Asia/Kolkata',
     is_verified: true,
-    open_hours: 'Today 5 PM - 12 AM'
+    open_hours: 'Today 5 PM - 12 AM',
+    hero_image: 'https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=800&h=600&fit=crop&crop=center'
   },
   {
     id: 'v6',
@@ -107,7 +108,8 @@ const SEED_VENUES: Venue[] = [
     phone: '+91 98765 43215',
     tz: 'Asia/Kolkata',
     is_verified: true,
-    open_hours: 'Today 8 PM - 2 AM'
+    open_hours: 'Today 8 PM - 2 AM',
+    hero_image: 'https://images.unsplash.com/photo-1574391884720-bbc8673de6fa?w=800&h=600&fit=crop&crop=center'
   }
 ];
 

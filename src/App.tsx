@@ -33,7 +33,7 @@ const App = () => {
         </BrowserRouter>
         
         {/* Floating Cyberpunk Music Control */}
-        <div className="fixed bottom-6 right-6 z-30">
+        <div className="fixed bottom-20 right-6 z-40">
           <button
             onClick={handleMusicToggle}
             className={`

@@ -15,7 +15,7 @@ export const MUSIC_CONFIG = {
   // Music settings
   VOLUME: 0.3,
   LOOP: true,
-  AUTOPLAY: true, // Auto-play when user reaches auth screen
+  AUTOPLAY: false, // Users must click play
   
   // Alternative: If you want to fetch music URL from backend API
   // FETCH_FROM_API: true,

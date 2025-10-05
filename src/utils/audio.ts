@@ -4,9 +4,23 @@ import { MUSIC_CONFIG, getMusicUrl } from '@/config/music';
 
 let currentAudio: HTMLAudioElement | null = null;
 let isPlaying = false;
+let isPaused = false;
 let audioContext: AudioContext | null = null;
 let synthesizedMusicInterval: NodeJS.Timeout | null = null;
 let isSynthesizedPlaying = false;
+let audioStateListeners: Array<(isPlaying: boolean, isPaused: boolean) => void> = [];
+
+// Audio state management
+const notifyStateChange = () => {
+  audioStateListeners.forEach(listener => listener(isPlaying, isPaused));
+};
+
+export const addAudioStateListener = (listener: (isPlaying: boolean, isPaused: boolean) => void) => {
+  audioStateListeners.push(listener);
+  return () => {
+    audioStateListeners = audioStateListeners.filter(l => l !== listener);
+  };
+};
 
 // Initialize audio context on first user interaction
 const initAudioContext = () => {
@@ -39,12 +53,31 @@ export const playBackgroundMusic = async (customUrl?: string) => {
     currentAudio.addEventListener('loadeddata', () => console.log('📊 Music data loaded'));
     currentAudio.addEventListener('canplay', () => console.log('✅ Music can play'));
     currentAudio.addEventListener('canplaythrough', () => console.log('✅ Music ready to play through'));
-    currentAudio.addEventListener('play', () => console.log('▶️ Music started playing'));
-    currentAudio.addEventListener('pause', () => console.log('⏸️ Music paused'));
+    currentAudio.addEventListener('play', () => {
+      console.log('▶️ Music started playing');
+      isPlaying = true;
+      isPaused = false;
+      notifyStateChange();
+    });
+    currentAudio.addEventListener('pause', () => {
+      console.log('⏸️ Music paused');
+      isPlaying = false;
+      isPaused = true;
+      notifyStateChange();
+    });
+    currentAudio.addEventListener('ended', () => {
+      console.log('🔚 Music ended');
+      isPlaying = false;
+      isPaused = false;
+      notifyStateChange();
+    });
     currentAudio.addEventListener('error', (e) => {
       console.error('❌ Music error:', e);
       console.error('❌ Error details:', currentAudio?.error);
       console.log('🎵 Music failed to load. Please check your Google Drive sharing settings.');
+      isPlaying = false;
+      isPaused = false;
+      notifyStateChange();
     });
     currentAudio.addEventListener('abort', () => console.log('🛑 Music aborted'));
     currentAudio.addEventListener('stalled', () => console.log('⏳ Music stalled'));
@@ -56,14 +89,17 @@ export const playBackgroundMusic = async (customUrl?: string) => {
     if (playPromise !== undefined) {
       playPromise
         .then(() => {
-          isPlaying = true;
           console.log('🎵 Music started successfully!');
+          // State is already updated by the 'play' event listener
         })
         .catch((error) => {
           console.error('❌ Failed to play music:', error);
           console.error('❌ Error name:', error.name);
           console.error('❌ Error message:', error.message);
           console.log('🎵 Music failed to play. Please check your Google Drive sharing settings.');
+          isPlaying = false;
+          isPaused = false;
+          notifyStateChange();
         });
     }
 
@@ -110,7 +146,9 @@ const stopAllMusic = () => {
   }
   
   isPlaying = false;
+  isPaused = false;
   isSynthesizedPlaying = false;
+  notifyStateChange();
   console.log('✅ All music stopped');
 };
 
@@ -165,7 +203,32 @@ const playSynthesizedMusic = () => {
   }
 };
 
-// Stop background music
+// Pause background music (preserves position)
+export const pauseBackgroundMusic = () => {
+  if (currentAudio && !currentAudio.paused) {
+    console.log('⏸️ Pausing music...');
+    currentAudio.pause();
+    // State will be updated by the 'pause' event listener
+  }
+};
+
+// Resume background music (from current position)
+export const resumeBackgroundMusic = () => {
+  if (currentAudio && currentAudio.paused) {
+    console.log('▶️ Resuming music...');
+    const playPromise = currentAudio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((error) => {
+        console.error('❌ Failed to resume music:', error);
+        isPlaying = false;
+        isPaused = true;
+        notifyStateChange();
+      });
+    }
+  }
+};
+
+// Stop background music (resets position)
 export const stopBackgroundMusic = () => {
   stopAllMusic();
 };

@@ -9,6 +9,7 @@ import { LiveFeed } from '@/features/LiveFeed';
 import { Chat } from '@/features/Chat';
 import { OwnerMode } from '@/features/OwnerMode';
 import { Auth } from '@/features/Auth';
+import { Profile } from '@/features/Profile';
 
 type Screen = 'auth' | 'home' | 'feed' | 'owner' | 'profile' | 'venue-detail' | 'chat';
 
@@ -44,6 +45,11 @@ export default function CrowdSphere() {
     setScreenState({ current: 'home' });
   };
 
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setScreenState({ current: 'auth' });
+  };
+
   if (!isAuthenticated) {
     return <Auth onAuth={handleAuth} />;
   }
@@ -76,6 +82,9 @@ export default function CrowdSphere() {
             onBack={goBack}
           />
         );
+      
+      case 'profile':
+        return <Profile onLogout={handleLogout} />;
       
       default:
         return <Home onVenueClick={navigateToVenue} />;

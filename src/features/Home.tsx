@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { VenueCard } from '@/ui/VenueCard';
 import { CrowdFilter, TypeFilter, PriceFilter } from '@/ui/FilterChips';
 import { MapView } from '@/components/MapView';
+import { GoogleMapView } from '@/components/GoogleMapView';
 import { useAudio } from '@/hooks/use-audio';
 import type { Venue, CrowdLevel, VenueType, PriceLevel } from '@/data/models';
 import { MockDataSource } from '@/data/sources/MockDataSource';
@@ -30,6 +31,7 @@ export function Home({ onVenueClick }: HomeProps) {
   const [typeFilter, setTypeFilter] = useState<VenueType | null>(null);
   const [priceFilter, setPriceFilter] = useState<PriceLevel | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   const loadVenues = async () => {
     setLoading(true);
@@ -58,6 +60,34 @@ export function Home({ onVenueClick }: HomeProps) {
     loadVenues();
   }, [crowdFilter, typeFilter, priceFilter, searchQuery]);
 
+  // Get user location
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.log('Location access denied or failed:', error);
+          // Use default Mumbai location
+          setUserLocation({
+            lat: 19.0760,
+            lng: 72.8777
+          });
+        }
+      );
+    } else {
+      // Use default Mumbai location
+      setUserLocation({
+        lat: 19.0760,
+        lng: 72.8777
+      });
+    }
+  }, []);
+
   const handleToggleFavorite = async (venueId: string) => {
     try {
       const isFavorite = await dataSource.toggleFavorite(venueId);
@@ -74,6 +104,7 @@ export function Home({ onVenueClick }: HomeProps) {
       console.error('Failed to toggle favorite:', error);
     }
   };
+
 
   const clearFilters = () => {
     setCrowdFilter(null);
@@ -202,11 +233,12 @@ export function Home({ onVenueClick }: HomeProps) {
       {/* Content */}
       <div className="px-4">
         {viewMode === 'map' ? (
-          // Interactive Map View
+          // Google Maps with Real Venue Locations
           <div className="my-4">
-            <MapView 
+            <GoogleMapView 
               venues={venues}
               onVenueClick={onVenueClick}
+              userLocation={userLocation}
               className="h-96"
             />
           </div>

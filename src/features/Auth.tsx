@@ -1,9 +1,11 @@
 // Authentication Screen with Real Logos
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MapPin, Smartphone, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { GoogleSignInButton, AppleSignInButton, FacebookSignInButton, SocialLogin } from '@/components/AuthComponents';
+import { playBackgroundMusic } from '@/utils/audio';
+import { useAudio } from '@/hooks/use-audio';
 
 interface AuthProps {
   onAuth: () => void;
@@ -11,6 +13,38 @@ interface AuthProps {
 
 export function Auth({ onAuth }: AuthProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const { enableMusic } = useAudio();
+
+  // Auto-play music on first user interaction (browser autoplay restriction)
+  useEffect(() => {
+    const handleFirstInteraction = async () => {
+      try {
+        console.log('🎵 Starting music on first user interaction...');
+        await playBackgroundMusic();
+        // Enable music state so the toggle button shows correct state
+        enableMusic();
+        
+        // Remove event listeners after first interaction
+        document.removeEventListener('click', handleFirstInteraction);
+        document.removeEventListener('touchstart', handleFirstInteraction);
+        document.removeEventListener('keydown', handleFirstInteraction);
+      } catch (error) {
+        console.log('🎵 Music start failed:', error);
+      }
+    };
+
+    // Add event listeners for first user interaction
+    document.addEventListener('click', handleFirstInteraction, { once: true });
+    document.addEventListener('touchstart', handleFirstInteraction, { once: true });
+    document.addEventListener('keydown', handleFirstInteraction, { once: true });
+
+    // Cleanup function
+    return () => {
+      document.removeEventListener('click', handleFirstInteraction);
+      document.removeEventListener('touchstart', handleFirstInteraction);
+      document.removeEventListener('keydown', handleFirstInteraction);
+    };
+  }, [enableMusic]);
 
   const handleAuth = async (provider: 'apple' | 'google' | 'email') => {
     setIsLoading(true);
