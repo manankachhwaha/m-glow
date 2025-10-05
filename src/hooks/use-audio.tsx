@@ -23,6 +23,7 @@ export const useAudio = () => {
 
     // Listen to actual audio state changes
     const unsubscribe = addAudioStateListener((playing, paused) => {
+      console.log('🎵 Audio state changed:', { playing, paused });
       setIsActuallyPlaying(playing);
       setIsPaused(paused);
       
@@ -30,6 +31,10 @@ export const useAudio = () => {
       if (playing) {
         setIsMusicEnabled(true);
         localStorage.setItem('music-enabled', 'true');
+      } else if (!paused) {
+        // Music stopped completely
+        setIsMusicEnabled(false);
+        localStorage.removeItem('music-enabled');
       }
     });
 
@@ -37,14 +42,19 @@ export const useAudio = () => {
   }, []);
 
   const toggleMusic = () => {
+    console.log('🎵 Toggle music called:', { isActuallyPlaying, isPaused });
+    
     if (isActuallyPlaying) {
       // Music is playing, pause it
+      console.log('🎵 Pausing music...');
       pauseBackgroundMusic();
     } else if (isPaused) {
       // Music is paused, resume it
+      console.log('🎵 Resuming music...');
       resumeBackgroundMusic();
     } else {
       // Music is stopped, start it
+      console.log('🎵 Starting music...');
       playBackgroundMusic();
     }
   };
