@@ -81,8 +81,7 @@ export default function CrowdSphere() {
         return <LiveFeed onVenueClick={navigateToVenue} />;
       
       case 'owner':
-        console.log('🎯 Rendering OwnerMode component!');
-        return <OwnerMode />;
+        return <OwnerMode venueId={ownerVenueId} venueName={ownerVenueName || 'Your Venue'} />;
       
       case 'venue-detail':
         return (
