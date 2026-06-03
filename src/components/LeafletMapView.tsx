@@ -7,25 +7,22 @@ import type { Venue } from '@/data/models';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-// Fix Leaflet's broken default icon paths in Vite
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconUrl: markerIcon,
-  iconRetinaUrl: markerIcon2x,
-  shadowUrl: markerShadow,
-});
+L.Icon.Default.mergeOptions({ iconUrl: markerIcon, iconRetinaUrl: markerIcon2x, shadowUrl: markerShadow });
 
 interface LeafletMapViewProps {
   venues: Venue[];
   onVenueClick?: (venueId: string) => void;
   className?: string;
   userLocation?: { lat: number; lng: number } | null;
+  radiusKm?: number;
 }
 
 const MUMBAI = { lat: 19.076, lng: 72.8777 };
+const NEON_PINK = '#ff2d78';
 
 function crowdColor(level?: string) {
   switch (level) {
@@ -52,13 +49,7 @@ function makeMarkerIcon(color: string) {
             fill="${color}" opacity="0.9"/>
       <circle cx="14" cy="14" r="6" fill="white" opacity="0.9"/>
     </svg>`;
-  return L.divIcon({
-    html: svg,
-    className: '',
-    iconSize: [28, 36],
-    iconAnchor: [14, 36],
-    popupAnchor: [0, -36],
-  });
+  return L.divIcon({ html: svg, className: '', iconSize: [28, 36], iconAnchor: [14, 36], popupAnchor: [0, -36] });
 }
 
 function makeUserIcon() {
@@ -66,79 +57,75 @@ function makeUserIcon() {
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
       <circle cx="10" cy="10" r="8" fill="#00ddff" opacity="0.9" stroke="white" stroke-width="2"/>
     </svg>`;
-  return L.divIcon({
-    html: svg,
-    className: '',
-    iconSize: [20, 20],
-    iconAnchor: [10, 10],
-    popupAnchor: [0, -12],
-  });
+  return L.divIcon({ html: svg, className: '', iconSize: [20, 20], iconAnchor: [10, 10], popupAnchor: [0, -12] });
 }
 
-export function LeafletMapView({ venues, onVenueClick, className, userLocation }: LeafletMapViewProps) {
+export function LeafletMapView({ venues, onVenueClick, className, userLocation, radiusKm }: LeafletMapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const userMarkerRef = useRef<L.Marker | null>(null);
   const venueMarkersRef = useRef<L.Marker[]>([]);
+  const radiusCircleRef = useRef<L.Circle | null>(null);
 
-  // Initialize map once
+  // Init map once
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
-
-    const map = L.map(containerRef.current, {
-      center: [MUMBAI.lat, MUMBAI.lng],
-      zoom: 13,
-      zoomControl: false,
-    });
-
+    const map = L.map(containerRef.current, { center: [MUMBAI.lat, MUMBAI.lng], zoom: 13, zoomControl: false });
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors',
       className: 'map-tiles-dark',
     }).addTo(map);
-
     L.control.zoom({ position: 'bottomright' }).addTo(map);
-
     mapRef.current = map;
-
-    return () => {
-      map.remove();
-      mapRef.current = null;
-    };
+    return () => { map.remove(); mapRef.current = null; };
   }, []);
 
-  // Update user location marker
+  // User location marker
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
-
-    if (userMarkerRef.current) {
-      userMarkerRef.current.remove();
-      userMarkerRef.current = null;
-    }
-
+    userMarkerRef.current?.remove();
+    userMarkerRef.current = null;
     if (userLocation) {
-      const marker = L.marker([userLocation.lat, userLocation.lng], { icon: makeUserIcon() })
-        .addTo(map)
-        .bindPopup('<b>You are here</b>');
-      userMarkerRef.current = marker;
-      map.setView([userLocation.lat, userLocation.lng], 15);
+      userMarkerRef.current = L.marker([userLocation.lat, userLocation.lng], { icon: makeUserIcon() })
+        .addTo(map).bindPopup('<b>You are here</b>');
+      map.setView([userLocation.lat, userLocation.lng], 13);
     }
   }, [userLocation]);
 
-  // Update venue markers
+  // Radius circle — updates live with userLocation + radiusKm
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
+    radiusCircleRef.current?.remove();
+    radiusCircleRef.current = null;
+
+    if (radiusKm != null && radiusKm > 0) {
+      const center = userLocation ?? MUMBAI;
+      radiusCircleRef.current = L.circle([center.lat, center.lng], {
+        radius: radiusKm * 1000,
+        color: NEON_PINK,
+        weight: 2,
+        opacity: 0.9,
+        fillColor: NEON_PINK,
+        fillOpacity: 0.15,
+        interactive: false,
+      }).addTo(map);
+    }
+  }, [userLocation, radiusKm]);
+
+  // Venue markers
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
     venueMarkersRef.current.forEach(m => m.remove());
     venueMarkersRef.current = [];
 
     venues.forEach(venue => {
       if (!venue.lat || !venue.lng) return;
-
       const color = crowdColor(venue.current_crowd);
       const marker = L.marker([venue.lat, venue.lng], { icon: makeMarkerIcon(color) }).addTo(map);
-
       const priceStr = '₹'.repeat(venue.price_level ?? 1);
       const crowdLabel = venue.current_crowd
         ? venue.current_crowd.charAt(0).toUpperCase() + venue.current_crowd.slice(1)
@@ -154,13 +141,12 @@ export function LeafletMapView({ venues, onVenueClick, className, userLocation }
             <span>${priceStr}</span>
           </div>
           ${venue.open_hours ? `<p style="font-size:11px;color:#888;margin:2px 0">${venue.open_hours}</p>` : ''}
-          <button
-            id="lf-venue-${venue.id}"
-            style="margin-top:8px;width:100%;padding:6px;background:linear-gradient(135deg,#00ff88,#0088ff);
-                   color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer"
-          >View Details</button>
-        </div>
-      `);
+          <button id="lf-venue-${venue.id}"
+            style="margin-top:8px;width:100%;padding:6px;background:linear-gradient(135deg,${NEON_PINK},#8b00ff);
+                   color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">
+            View Details
+          </button>
+        </div>`);
 
       marker.on('popupopen', () => {
         setTimeout(() => {
@@ -168,7 +154,6 @@ export function LeafletMapView({ venues, onVenueClick, className, userLocation }
             ?.addEventListener('click', () => onVenueClick?.(venue.id));
         }, 0);
       });
-
       venueMarkersRef.current.push(marker);
     });
   }, [venues, onVenueClick]);
@@ -176,12 +161,11 @@ export function LeafletMapView({ venues, onVenueClick, className, userLocation }
   const recenter = () => {
     if (!mapRef.current) return;
     const center = userLocation ?? MUMBAI;
-    mapRef.current.setView([center.lat, center.lng], 15);
+    mapRef.current.setView([center.lat, center.lng], 13);
   };
 
   return (
     <div className={cn('relative w-full rounded-3xl overflow-hidden', className)}>
-      {/* Dark overlay filter for the tiles */}
       <style>{`
         .map-tiles-dark { filter: brightness(0.6) saturate(0.4) hue-rotate(180deg); }
         .leaflet-popup-content-wrapper { border-radius: 12px; }
@@ -193,7 +177,7 @@ export function LeafletMapView({ venues, onVenueClick, className, userLocation }
       {/* Legend */}
       <div className="absolute bottom-10 left-3 z-[1000] bg-black/70 backdrop-blur-md text-white p-3 rounded-xl text-xs space-y-1">
         <div className="font-semibold mb-1">Live Venues</div>
-        {[['busy','#ff0080','Busy'],['moderate','#ff8800','Moderate'],['quiet','#00ff88','Quiet']].map(([,c,l]) => (
+        {[['#ff0080','Busy'],['#ff8800','Moderate'],['#00ff88','Quiet']].map(([c,l]) => (
           <div key={l} className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full" style={{ background: c }} />
             <span className="text-white/80">{l}</span>
@@ -207,12 +191,10 @@ export function LeafletMapView({ venues, onVenueClick, className, userLocation }
         )}
       </div>
 
-      {/* Re-center button */}
-      <button
-        onClick={recenter}
+      {/* Re-center */}
+      <button onClick={recenter}
         className="absolute top-3 right-3 z-[1000] p-2 bg-black/60 backdrop-blur-md rounded-lg hover:bg-black/80 transition-all"
-        title="Center map"
-      >
+        title="Center map">
         <Navigation className="w-5 h-5 text-cyan-400" />
       </button>
     </div>
