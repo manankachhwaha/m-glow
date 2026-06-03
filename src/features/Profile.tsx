@@ -319,7 +319,7 @@ export function Profile({ onLogout }: ProfileProps) {
                 </div>
               </div>
               <button
-                onClick={() => setNotifications(!notifications)}
+                onClick={() => { const v = !notifications; setNotifications(v); savePreference('pref_notifications', v); }}
                 className={cn(
                   'w-12 h-6 rounded-full transition-all duration-300',
                   'backdrop-blur-xl border border-white/10',
