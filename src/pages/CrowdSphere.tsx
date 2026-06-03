@@ -75,7 +75,7 @@ export default function CrowdSphere() {
   const renderScreen = () => {
     switch (screenState.current) {
       case 'home':
-        return <Home onVenueClick={navigateToVenue} />;
+        return <Home onVenueClick={navigateToVenue} onOpenChat={navigateToChat} />;
       
       case 'feed':
         return <LiveFeed onVenueClick={navigateToVenue} />;
