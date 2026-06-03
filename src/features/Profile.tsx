@@ -3,9 +3,6 @@
 import { useState, useEffect } from 'react';
 import { LogOut, User, Settings, Heart, MapPin, Clock, Bell, Shield, HelpCircle, Edit3, Camera, Eye, EyeOff, Store } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { MockDataSource } from '@/data/sources/MockDataSource';
-
-const dataSource = new MockDataSource();
 
 interface ProfileProps {
   onLogout: () => void;
