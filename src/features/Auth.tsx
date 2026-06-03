@@ -24,10 +24,9 @@ export function Auth({ onAuth }: AuthProps) {
       hasTriggered = true;
       
       try {
-        console.log('🎵 Starting music on first user interaction...');
-        toggleMusic(); // Use the centralized music toggle instead of direct calls
-      } catch (error) {
-        console.log('🎵 Music start failed:', error);
+        toggleMusic();
+      } catch {
+        // Music autoplay blocked — user can tap the button manually
       }
     };
 
