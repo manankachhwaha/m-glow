@@ -334,8 +334,8 @@ export function GoogleMapView({
         <div className="absolute inset-0 flex items-center justify-center"
           style={{ background: '#e8e8e0' }}>
           <div className="text-center p-6">
-            <p className="text-white/50 text-sm mb-1">Map unavailable</p>
-            <p className="text-white/30 text-xs">Check that Maps JS, Places &amp; Geocoding APIs are enabled</p>
+            <p className="text-gray-500 text-sm mb-1">Map unavailable</p>
+            <p className="text-gray-400 text-xs">Check that Maps JS, Places &amp; Geocoding APIs are enabled</p>
           </div>
         </div>
       )}
