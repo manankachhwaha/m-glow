@@ -16,10 +16,8 @@ export function SimpleOwnerMode() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    console.log('📱 File selected:', file.name);
-
     if (!file.type.startsWith('image/')) {
-      alert('Please select a valid image file');
+      alert('Please capture a valid photo');
       return;
     }
 
@@ -27,21 +25,12 @@ export function SimpleOwnerMode() {
     setUploadSuccess(false);
 
     try {
-      console.log('🎭 Starting simple face blur...');
-      
       const result = await simpleBlurFaces(file);
-      
-      console.log('✅ Simple blur completed:', result);
-      
       setPreviewUrl(result.blurredDataUrl);
       setSelectedFile(file);
       setFacesDetected(result.facesDetected);
       setProcessingTime(result.processingTime);
-      
-    } catch (error) {
-      console.error('❌ Simple blur failed:', error);
-      
-      // Fallback to original image
+    } catch {
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
       setSelectedFile(file);
