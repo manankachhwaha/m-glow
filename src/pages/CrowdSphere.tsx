@@ -69,6 +69,7 @@ export default function CrowdSphere() {
   };
 
   const handleLogout = () => {
+    localStorage.removeItem('auth_session');
     setIsAuthenticated(false);
     setScreenState({ current: 'auth' });
   };
