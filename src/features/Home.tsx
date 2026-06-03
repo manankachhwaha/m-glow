@@ -37,7 +37,7 @@ export function Home({ onVenueClick }: HomeProps) {
   // Real-time features
   // Real-time features removed for simplification
 
-  const loadVenues = async () => {
+  const loadVenues = useCallback(async () => {
     setLoading(true);
     try {
       const results = await dataSource.listVenues({
