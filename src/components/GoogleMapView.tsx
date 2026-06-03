@@ -164,10 +164,16 @@ export function GoogleMapView({
     const map = new google.maps.Map(containerRef.current, {
       center: center0,
       zoom: 14,
-      styles: DARK_MAP_STYLE as google.maps.MapTypeStyle[],
+      // No custom styles — pure Google Maps default appearance
       disableDefaultUI: true,
+      keyboardShortcuts: false,
       gestureHandling: 'greedy',
       clickableIcons: false,
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: false,
+      rotateControl: false,
+      scaleControl: false,
     });
 
     mapRef.current = map;
