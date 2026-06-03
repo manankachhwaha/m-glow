@@ -57,11 +57,23 @@ export function Profile({ onLogout }: ProfileProps) {
   };
 
   const handleSaveProfile = () => {
-    // Save profile data to localStorage
     localStorage.setItem('profile-data', JSON.stringify(profileData));
     localStorage.setItem('anonymous-mode', isAnonymous.toString());
     localStorage.setItem('business-mode', isBusinessMode.toString());
+    localStorage.setItem('owner_venue_id', ownerVenueId);
+    const venue = availableVenues.find(v => v.id === ownerVenueId);
+    if (venue) localStorage.setItem('owner_venue_name', venue.name);
     setIsEditing(false);
+  };
+
+  const handleVenueSelect = (venueId: string) => {
+    setOwnerVenueId(venueId);
+    localStorage.setItem('owner_venue_id', venueId);
+    const venue = availableVenues.find(v => v.id === venueId);
+    if (venue) {
+      localStorage.setItem('owner_venue_name', venue.name);
+      window.dispatchEvent(new Event('storage'));
+    }
   };
 
   const handleBusinessModeToggle = (enabled: boolean) => {
