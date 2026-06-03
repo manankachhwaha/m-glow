@@ -71,6 +71,14 @@ function AddVenueForm({ onSave, onCancel }: AddVenueFormProps) {
     );
   };
 
+  const handleCoverPhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => setForm(p => ({ ...p, hero_image: ev.target?.result as string }));
+    reader.readAsDataURL(file);
+  };
+
   const handleSubmit = () => {
     if (!form.name.trim() || !form.address.trim()) return;
     const venue: OwnerVenue = {
