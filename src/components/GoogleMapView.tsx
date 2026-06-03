@@ -305,7 +305,7 @@ export function GoogleMapView({
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className={cn('relative w-full rounded-3xl overflow-hidden', className)}
-      style={{ background: '#212121' }}>
+      style={{ background: '#e8e8e0' }}>
 
       {/* Suppress Google Maps footer UI + float autocomplete dropdown */}
       <style>{`
@@ -322,7 +322,7 @@ export function GoogleMapView({
       {/* Loading overlay */}
       {status === 'loading' && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3"
-          style={{ background: '#212121' }}>
+          style={{ background: '#e8e8e0' }}>
           <div className="w-10 h-10 rounded-full border-2 border-t-transparent animate-spin"
             style={{ borderColor: `${CYAN} transparent ${CYAN} ${CYAN}` }} />
           <p className="text-sm font-medium" style={{ color: CYAN }}>Loading map…</p>
@@ -332,7 +332,7 @@ export function GoogleMapView({
       {/* Error overlay */}
       {status === 'error' && (
         <div className="absolute inset-0 flex items-center justify-center"
-          style={{ background: '#212121' }}>
+          style={{ background: '#e8e8e0' }}>
           <div className="text-center p-6">
             <p className="text-white/50 text-sm mb-1">Map unavailable</p>
             <p className="text-white/30 text-xs">Check that Maps JS, Places &amp; Geocoding APIs are enabled</p>
