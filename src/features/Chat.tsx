@@ -1,6 +1,6 @@
 // Chat Screen — Claude AI venue assistant
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft, Send, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Message, FaqItem, VenueDetail } from '@/data/models';
