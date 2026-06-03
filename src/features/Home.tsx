@@ -33,6 +33,34 @@ export function Home({ onVenueClick, onOpenChat }: HomeProps) {
   const [priceFilter, setPriceFilter] = useState<PriceLevel | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [pullDistance, setPullDistance] = useState(0);
+  const touchStartY = useRef(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const PULL_THRESHOLD = 72;
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const scrollTop = scrollRef.current?.scrollTop ?? 0;
+    if (scrollTop > 0) return;
+    const delta = e.touches[0].clientY - touchStartY.current;
+    if (delta > 0) setPullDistance(Math.min(delta, PULL_THRESHOLD + 20));
+  };
+
+  const handleTouchEnd = async () => {
+    if (pullDistance >= PULL_THRESHOLD) {
+      setIsRefreshing(true);
+      setPullDistance(0);
+      await loadVenues();
+      setIsRefreshing(false);
+    } else {
+      setPullDistance(0);
+    }
+  };
 
   const loadVenues = useCallback(async () => {
     setLoading(true);
