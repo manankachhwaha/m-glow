@@ -237,9 +237,12 @@ export class MockDataSource implements IDataSource {
   private messages: Map<string, Message[]> = new Map();
 
   async listVenues(params: VenueListParams): Promise<Venue[]> {
-    await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
-    
-    let venues = [...SEED_VENUES];
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    // Merge seed venues with any owner-added venues
+    const ownerVenues = loadOwnerVenuesAsVenues();
+    const ownerIds = new Set(ownerVenues.map(v => v.id));
+    let venues = [...SEED_VENUES.filter(v => !ownerIds.has(v.id)), ...ownerVenues];
     
     // Apply filters
     if (params.type) {
