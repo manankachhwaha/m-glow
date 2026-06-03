@@ -255,7 +255,7 @@ function UploadPanel({ venue, onClose }: UploadPanelProps) {
         ref={(el) => { inputRef.current = el; }}
         type="file"
         accept="image/*"
-        capture="environment"
+        capture
         className="hidden"
         onChange={handleFileSelect}
       />

@@ -104,7 +104,7 @@ export function SimpleOwnerMode({ venueId, venueName }: SimpleOwnerModeProps) {
             ref={fileInputRef}
             type="file"
             accept="image/*"
-            capture="environment"
+            capture
             onChange={handleFileSelect}
             className="hidden"
           />
