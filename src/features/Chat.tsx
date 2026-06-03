@@ -51,14 +51,6 @@ export function Chat({ venueId, venueName, onBack }: ChatProps) {
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    initializeChat();
-  }, [initializeChat]);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
   const initializeChat = useCallback(async () => {
     try {
       const [detail, faqs] = await Promise.all([
