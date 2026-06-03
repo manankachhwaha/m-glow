@@ -24,24 +24,22 @@ export default function CrowdSphere() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [screenState, setScreenState] = useState<ScreenState>({ current: 'auth' });
   const [isBusinessMode, setIsBusinessMode] = useState(false);
+  const [ownerVenueId, setOwnerVenueId] = useState('');
+  const [ownerVenueName, setOwnerVenueName] = useState('');
 
-  // Load business mode from localStorage
+  const syncOwnerState = () => {
+    setIsBusinessMode(localStorage.getItem('business-mode') === 'true');
+    setOwnerVenueId(localStorage.getItem('owner_venue_id') || '');
+    setOwnerVenueName(localStorage.getItem('owner_venue_name') || '');
+  };
+
   useEffect(() => {
-    const businessMode = localStorage.getItem('business-mode');
-    if (businessMode === 'true') {
-      setIsBusinessMode(true);
-    }
+    syncOwnerState();
   }, []);
 
-  // Listen for business mode changes
   useEffect(() => {
-    const handleBusinessModeChange = () => {
-      const businessMode = localStorage.getItem('business-mode');
-      setIsBusinessMode(businessMode === 'true');
-    };
-
-    window.addEventListener('storage', handleBusinessModeChange);
-    return () => window.removeEventListener('storage', handleBusinessModeChange);
+    window.addEventListener('storage', syncOwnerState);
+    return () => window.removeEventListener('storage', syncOwnerState);
   }, []);
 
   const handleAuth = () => {
