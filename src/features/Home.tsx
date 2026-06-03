@@ -9,10 +9,10 @@ import { LeafletMapView } from '@/components/LeafletMapView';
 import { RealDiscoBall } from '@/components/RealDiscoBall';
 import { useAudio } from '@/hooks/use-audio';
 import type { Venue, CrowdLevel, VenueType, PriceLevel } from '@/data/models';
-import { MockDataSource } from '@/data/sources/MockDataSource';
+
 // Real-time features removed for simplification
 
-const dataSource = new MockDataSource();
+import { dataSource } from '@/data/sources';
 
 interface HomeProps {
   onVenueClick?: (venueId: string) => void;

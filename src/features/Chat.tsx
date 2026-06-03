@@ -4,10 +4,10 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft, Send, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Message, FaqItem, VenueDetail } from '@/data/models';
-import { MockDataSource } from '@/data/sources/MockDataSource';
+
 import { getClaudeResponse, type ClaudeMessage } from '@/utils/claude';
 
-const dataSource = new MockDataSource();
+import { dataSource } from '@/data/sources';
 
 interface ChatProps {
   venueId: string;

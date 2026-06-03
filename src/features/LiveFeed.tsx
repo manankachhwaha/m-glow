@@ -6,10 +6,10 @@ import { cn } from '@/lib/utils';
 import { CrowdBadge } from '@/ui/Badge';
 import { ImageModal } from '@/components/ui/image-modal';
 import type { Post } from '@/data/models';
-import { MockDataSource } from '@/data/sources/MockDataSource';
+
 import { getPostAge } from '@/utils/crowd';
 
-const dataSource = new MockDataSource();
+import { dataSource } from '@/data/sources';
 
 interface LiveFeedProps {
   onVenueClick?: (venueId: string) => void;

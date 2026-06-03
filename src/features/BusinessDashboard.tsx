@@ -3,10 +3,10 @@ import { useState, useEffect } from 'react';
 import { Plus, Store, MapPin, Phone, Clock, Camera, ChevronRight, ArrowLeft, CheckCircle, Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { simpleBlurFaces } from '@/utils/simpleFaceBlur';
-import { MockDataSource } from '@/data/sources/MockDataSource';
+
 import type { VenueType, PriceLevel } from '@/data/models';
 
-const dataSource = new MockDataSource();
+import { dataSource } from '@/data/sources';
 
 export interface OwnerVenue {
   id: string;

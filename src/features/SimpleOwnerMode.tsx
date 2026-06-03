@@ -2,9 +2,9 @@
 import React, { useState, useRef } from 'react';
 import { Camera, Upload, X, CheckCircle, Store } from 'lucide-react';
 import { simpleBlurFaces } from '@/utils/simpleFaceBlur';
-import { MockDataSource } from '@/data/sources/MockDataSource';
 
-const dataSource = new MockDataSource();
+
+import { dataSource } from '@/data/sources';
 
 interface SimpleOwnerModeProps {
   venueId: string;

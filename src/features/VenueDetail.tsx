@@ -5,10 +5,10 @@ import { ArrowLeft, Heart, MessageCircle, HelpCircle, Phone, Globe, MapPin, Cloc
 import { cn } from '@/lib/utils';
 import { CrowdBadge, PriceBadge, EleganceBadge } from '@/ui/Badge';
 import type { VenueDetail as VenueDetailType, Post } from '@/data/models';
-import { MockDataSource } from '@/data/sources/MockDataSource';
+
 import { getPostAge } from '@/utils/crowd';
 
-const dataSource = new MockDataSource();
+import { dataSource } from '@/data/sources';
 
 interface VenueDetailProps {
   venueId: string;
