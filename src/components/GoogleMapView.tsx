@@ -323,7 +323,10 @@ export function GoogleMapView({
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className={cn('relative w-full rounded-3xl overflow-hidden', className)}
-      style={{ background: '#04040e' }}>
+      style={{ background: '#212121' }}>
+
+      {/* pac-container needs to float above everything */}
+      <style>{`.pac-container { z-index: 99999 !important; border-radius: 10px; margin-top: 4px; }`}</style>
 
       {/* Map canvas — always rendered so the ref is available */}
       <div ref={containerRef} className="w-full h-full" />
@@ -331,17 +334,17 @@ export function GoogleMapView({
       {/* Loading overlay */}
       {status === 'loading' && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3"
-          style={{ background: '#04040e' }}>
+          style={{ background: '#212121' }}>
           <div className="w-10 h-10 rounded-full border-2 border-t-transparent animate-spin"
             style={{ borderColor: `${CYAN} transparent ${CYAN} ${CYAN}` }} />
-          <p className="text-sm font-medium" style={{ color: CYAN }}>Loading radar…</p>
+          <p className="text-sm font-medium" style={{ color: CYAN }}>Loading map…</p>
         </div>
       )}
 
       {/* Error overlay */}
       {status === 'error' && (
         <div className="absolute inset-0 flex items-center justify-center"
-          style={{ background: '#04040e' }}>
+          style={{ background: '#212121' }}>
           <div className="text-center p-6">
             <p className="text-white/50 text-sm mb-1">Map unavailable</p>
             <p className="text-white/30 text-xs">Check that Maps JS, Places &amp; Geocoding APIs are enabled</p>
@@ -349,20 +352,26 @@ export function GoogleMapView({
         </div>
       )}
 
-      {/* Search bar */}
-      {status === 'ready' && (
-        <div className="absolute top-3 left-3 right-12 z-10 flex items-center gap-2 px-3 py-2 rounded-xl"
-          style={{ background: 'rgba(4,4,14,0.85)', backdropFilter: 'blur(16px)',
-                   border: `1px solid rgba(0,245,255,0.22)` }}>
-          <Search className="w-4 h-4 flex-shrink-0" style={{ color: CYAN }} />
-          <input
-            ref={searchRef}
-            type="text"
-            placeholder="Search location…"
-            className="flex-1 bg-transparent text-white text-sm outline-none placeholder:text-white/35"
-          />
-        </div>
-      )}
+      {/* Search bar — always in DOM so searchRef is never null when autocomplete inits */}
+      <div
+        className="absolute top-3 left-3 right-12 z-10 flex items-center gap-2 px-3 py-2 rounded-xl"
+        style={{
+          background: 'rgba(33,33,33,0.92)',
+          backdropFilter: 'blur(16px)',
+          border: `1px solid rgba(0,245,255,0.22)`,
+          opacity: status === 'ready' ? 1 : 0,
+          pointerEvents: status === 'ready' ? 'auto' : 'none',
+        }}
+      >
+        <Search className="w-4 h-4 flex-shrink-0" style={{ color: CYAN }} />
+        <input
+          ref={searchRef}
+          type="text"
+          placeholder="Search location…"
+          className="flex-1 bg-transparent text-white text-sm outline-none placeholder:text-white/40"
+          style={{ minWidth: 0 }}
+        />
+      </div>
 
       {/* Fixed centre pin */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10"
