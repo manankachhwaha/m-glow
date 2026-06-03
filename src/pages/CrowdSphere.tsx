@@ -21,8 +21,12 @@ interface ScreenState {
 }
 
 export default function CrowdSphere() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [screenState, setScreenState] = useState<ScreenState>({ current: 'auth' });
+  const [isAuthenticated, setIsAuthenticated] = useState(() =>
+    localStorage.getItem('auth_session') === 'true'
+  );
+  const [screenState, setScreenState] = useState<ScreenState>(() => ({
+    current: localStorage.getItem('auth_session') === 'true' ? 'home' : 'auth',
+  }));
   const [isBusinessMode, setIsBusinessMode] = useState(false);
   const [ownerVenueId, setOwnerVenueId] = useState('');
   const [ownerVenueName, setOwnerVenueName] = useState('');
