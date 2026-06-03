@@ -1,6 +1,6 @@
 // Nightclub-Themed Home Screen - Map & List View
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Search, MapPin, List, Filter, Music, Volume2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { VenueCard } from '@/ui/VenueCard';
