@@ -17,14 +17,23 @@ export function Profile({ onLogout }: ProfileProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [isBusinessMode, setIsBusinessMode] = useState(false);
+  const [ownerVenueId, setOwnerVenueId] = useState('');
+  const [availableVenues, setAvailableVenues] = useState<{ id: string; name: string }[]>([]);
 
   // Load settings from localStorage
   useEffect(() => {
     const savedBusinessMode = localStorage.getItem('business-mode');
-    if (savedBusinessMode) {
-      setIsBusinessMode(savedBusinessMode === 'true');
-    }
+    if (savedBusinessMode) setIsBusinessMode(savedBusinessMode === 'true');
+    setOwnerVenueId(localStorage.getItem('owner_venue_id') || '');
   }, []);
+
+  // Load venue list when business mode is on
+  useEffect(() => {
+    if (!isBusinessMode) return;
+    dataSource.listVenues({ lat: 19.076, lng: 72.8777 }).then(venues => {
+      setAvailableVenues(venues.map(v => ({ id: v.id, name: v.name })));
+    });
+  }, [isBusinessMode]);
   
   // Profile data
   const [profileData, setProfileData] = useState({
