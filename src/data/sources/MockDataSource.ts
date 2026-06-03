@@ -205,6 +205,31 @@ const SEED_FAQ: FaqItem[] = SEED_VENUES.flatMap(venue => [
   }
 ]);
 
+function loadOwnerVenuesAsVenues(): Venue[] {
+  try {
+    const raw = JSON.parse(localStorage.getItem('owner_venues') || '[]') as Array<{
+      id: string; name: string; type: string; address: string;
+      lat: number; lng: number; phone: string; open_hours: string; price_level: number;
+    }>;
+    return raw.map(v => ({
+      id: v.id,
+      name: v.name,
+      type: v.type as Venue['type'],
+      address: v.address,
+      lat: v.lat,
+      lng: v.lng,
+      phone: v.phone,
+      open_hours: v.open_hours,
+      price_level: v.price_level as Venue['price_level'],
+      elegance: 0.7,
+      tz: 'Asia/Kolkata',
+      is_verified: false,
+    }));
+  } catch {
+    return [];
+  }
+}
+
 export class MockDataSource implements IDataSource {
   private currentUser: User | null = null;
   private favorites: Set<string> = new Set();
