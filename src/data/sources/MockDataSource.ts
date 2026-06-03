@@ -225,6 +225,7 @@ function loadOwnerVenuesAsVenues(): Venue[] {
       elegance: 0.7,
       tz: 'Asia/Kolkata',
       is_verified: false,
+      hero_image: (v as Record<string, unknown>).hero_image as string | undefined,
     }));
   } catch {
     return [];
