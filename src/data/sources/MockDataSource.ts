@@ -296,18 +296,16 @@ export class MockDataSource implements IDataSource {
     const allVenues = [...SEED_VENUES, ...loadOwnerVenuesAsVenues()];
     const venue = allVenues.find(v => v.id === id);
     if (!venue) throw new Error('Venue not found');
-    
-    const todayPosts = SEED_POSTS.filter(p => 
-      p.venue_id === id && isToday(p.created_at, venue.tz)
-    );
-    
+
+    // Use listTodayPosts so IndexedDB-persisted owner uploads are included
+    const todayPosts = await this.listTodayPosts(id);
     const { level } = computeCrowdLevel(todayPosts);
-    
+
     return {
       venue,
       today_posts: todayPosts,
-      events: [], // TODO: Add events
-      current_crowd: level
+      events: [],
+      current_crowd: level,
     };
   }
 
