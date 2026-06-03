@@ -108,8 +108,8 @@ export function SimpleOwnerMode() {
                 ) : (
                   <>
                     <Camera className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-                    <p className="text-white text-lg font-medium mb-2">Select Photo</p>
-                    <p className="text-slate-400">Click to choose an image file</p>
+                    <p className="text-white text-lg font-medium mb-2">Take Photo</p>
+                    <p className="text-slate-400">Camera only — no gallery uploads</p>
                   </>
                 )}
               </button>
