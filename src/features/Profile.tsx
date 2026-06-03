@@ -101,6 +101,7 @@ export function Profile({ onLogout }: ProfileProps) {
     localStorage.setItem('anonymous-mode', isAnonymous.toString());
     localStorage.setItem('business-mode', isBusinessMode.toString());
     localStorage.setItem('owner_venue_id', ownerVenueId);
+    localStorage.setItem('user_gender', gender);
     const venue = availableVenues.find(v => v.id === ownerVenueId);
     if (venue) localStorage.setItem('owner_venue_name', venue.name);
     setIsEditing(false);
