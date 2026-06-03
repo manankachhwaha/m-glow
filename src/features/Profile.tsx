@@ -242,6 +242,31 @@ export function Profile({ onLogout }: ProfileProps) {
                 />
               </div>
 
+              {/* Gender toggle — sets the map marker icon */}
+              <div>
+                <label className="text-sm font-medium text-muted-foreground block mb-2">Map Marker Style</label>
+                <div className="flex gap-3">
+                  <button type="button"
+                    onClick={() => setGender('female')}
+                    className={cn('flex-1 py-2.5 rounded-xl font-medium text-sm transition-all border',
+                      gender === 'female'
+                        ? 'bg-pink-500/20 border-pink-400/50 text-pink-300'
+                        : 'bg-black/20 border-white/10 text-white/50 hover:border-white/20'
+                    )}>
+                    👠 High Heel
+                  </button>
+                  <button type="button"
+                    onClick={() => setGender('male')}
+                    className={cn('flex-1 py-2.5 rounded-xl font-medium text-sm transition-all border',
+                      gender === 'male'
+                        ? 'bg-yellow-500/20 border-yellow-400/50 text-yellow-300'
+                        : 'bg-black/20 border-white/10 text-white/50 hover:border-white/20'
+                    )}>
+                    👑 Crown
+                  </button>
+                </div>
+              </div>
+
               {/* Save Button */}
               <button
                 onClick={handleSaveProfile}
