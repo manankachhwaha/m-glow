@@ -139,10 +139,7 @@ export default function CrowdSphere() {
                 icon={Upload}
                 label="Owner"
                 isActive={screenState.current === 'owner'}
-                onClick={() => {
-                  console.log('🎯 Owner button clicked!');
-                  navigateToScreen('owner');
-                }}
+                onClick={() => navigateToScreen('owner')}
               />
             )}
             <NavButton
