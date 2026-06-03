@@ -388,7 +388,7 @@ export function GoogleMapView({
       {/* Legend */}
       {status === 'ready' && (
         <div className="absolute bottom-10 left-3 z-10 p-3 rounded-xl text-xs space-y-1"
-          style={{ background: 'rgba(4,4,14,0.85)', backdropFilter: 'blur(12px)',
+          style={{ background: 'rgba(30,30,30,0.9)', backdropFilter: 'blur(12px)',
                    border: `1px solid rgba(0,245,255,0.15)` }}>
           <div className="font-semibold mb-1" style={{ color: CYAN }}>Live Venues</div>
           {[['#ff0080','Busy'],['#ff8800','Moderate'],['#00ff88','Quiet']].map(([c,l]) => (
@@ -409,7 +409,7 @@ export function GoogleMapView({
       {status === 'ready' && (
         <button onClick={recenter}
           className="absolute top-3 right-3 z-10 p-2 rounded-lg hover:opacity-80 transition-opacity"
-          style={{ background: 'rgba(4,4,14,0.85)', backdropFilter: 'blur(12px)',
+          style={{ background: 'rgba(30,30,30,0.9)', backdropFilter: 'blur(12px)',
                    border: `1px solid rgba(0,245,255,0.2)` }}>
           <Navigation className="w-5 h-5" style={{ color: CYAN }} />
         </button>
