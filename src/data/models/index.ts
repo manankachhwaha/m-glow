@@ -29,7 +29,8 @@ export interface Venue {
   tz: string; // IANA timezone
   owner_user_id?: string;
   is_verified: boolean;
-  open_hours?: string; // JSON string for MVP
+  open_hours?: string;
+  hero_image?: string;
   current_crowd?: CrowdLevel;
   distance?: number; // computed
 }
