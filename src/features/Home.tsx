@@ -474,7 +474,7 @@ export function Home({ onVenueClick, onOpenChat }: HomeProps) {
               </div>
             ) : (
               <div className="grid gap-4">
-                {venues.map((venue) => (
+                {(vibeVenues ?? venues).map((venue) => (
                   <VenueCard
                     key={venue.id}
                     venue={venue}
