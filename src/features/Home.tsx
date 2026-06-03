@@ -162,7 +162,28 @@ export function Home({ onVenueClick, onOpenChat }: HomeProps) {
   const hasActiveFilters = crowdFilter || typeFilter || priceFilter || searchQuery;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
+    <div
+      className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden"
+      ref={scrollRef}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Pull-to-refresh indicator */}
+      {(pullDistance > 0 || isRefreshing) && (
+        <div
+          className="absolute top-0 left-0 right-0 z-50 flex items-center justify-center transition-all duration-200"
+          style={{ height: isRefreshing ? 56 : pullDistance * 0.6 }}
+        >
+          <div className={cn(
+            'flex items-center gap-2 px-4 py-2 rounded-full bg-pink-500/20 backdrop-blur-md border border-pink-400/30 text-pink-300 text-sm',
+            (pullDistance >= PULL_THRESHOLD || isRefreshing) ? 'opacity-100' : 'opacity-60'
+          )}>
+            <RefreshCw className={cn('w-4 h-4', isRefreshing && 'animate-spin')} />
+            <span>{isRefreshing ? 'Refreshing…' : pullDistance >= PULL_THRESHOLD ? 'Release to refresh' : 'Pull to refresh'}</span>
+          </div>
+        </div>
+      )}
       {/* Nightclub Disco Lights Background */}
       <div className="fixed inset-0 pointer-events-none">
         {/* Rotating disco lights */}
