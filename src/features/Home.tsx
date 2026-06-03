@@ -169,6 +169,19 @@ export function Home({ onVenueClick, onOpenChat }: HomeProps) {
 
   const hasActiveFilters = crowdFilter || typeFilter || priceFilter || searchQuery;
 
+  const handleCheckVibe = async () => {
+    const center = mapCenter ?? userLocation ?? { lat: 19.076, lng: 72.8777 };
+    const area = await reverseGeocode(center.lat, center.lng);
+    const filtered = venues.filter(v => {
+      if (!v.lat || !v.lng) return false;
+      return calculateDistance(center.lat, center.lng, v.lat, v.lng) <= radiusKm;
+    });
+    setVibeArea(area);
+    setVibeVenues(filtered.length > 0 ? filtered : venues);
+    setLocationLabel(area);
+    setViewMode('list');
+  };
+
   return (
     <div
       className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden"
