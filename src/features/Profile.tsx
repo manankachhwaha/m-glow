@@ -1,8 +1,23 @@
 // Profile Screen with User Settings and Logout
 
 import { useState, useEffect } from 'react';
-import { LogOut, User, Settings, Heart, MapPin, Clock, Bell, Shield, HelpCircle, Edit3, Camera, Eye, EyeOff, Store } from 'lucide-react';
+import { LogOut, User, Settings, Heart, MapPin, Clock, Bell, Shield, HelpCircle, Edit3, Camera, Eye, EyeOff, Store, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { dataSource } from '@/data/sources';
+
+export interface VisitRecord { venue_id: string; venue_name: string; visited_at: string; }
+
+export function recordVisit(venueId: string, venueName: string) {
+  try {
+    const raw: VisitRecord[] = JSON.parse(localStorage.getItem('visit_history') || '[]');
+    // Avoid duplicate if same venue visited within 30 minutes
+    const recent = raw.find(r => r.venue_id === venueId &&
+      Date.now() - new Date(r.visited_at).getTime() < 30 * 60 * 1000);
+    if (recent) return;
+    raw.unshift({ venue_id: venueId, venue_name: venueName, visited_at: new Date().toISOString() });
+    localStorage.setItem('visit_history', JSON.stringify(raw.slice(0, 50)));
+  } catch { /* ignore */ }
+}
 
 interface ProfileProps {
   onLogout: () => void;
