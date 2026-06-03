@@ -52,6 +52,11 @@ export function Home({ onVenueClick, onOpenChat }: HomeProps) {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [radiusKm, setRadiusKm] = useState(5);
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
+  const [locationLabel, setLocationLabel] = useState('Mumbai, Maharashtra');
+  const [vibeArea, setVibeArea] = useState<string | null>(null);
+  const [vibeVenues, setVibeVenues] = useState<Venue[] | null>(null);
+  const gender = (localStorage.getItem('user_gender') as 'male' | 'female') ?? 'female';
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
   const touchStartY = useRef(0);
