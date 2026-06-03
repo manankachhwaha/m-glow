@@ -7,7 +7,7 @@ import { Home } from '@/features/Home';
 import { VenueDetail } from '@/features/VenueDetail';
 import { LiveFeed } from '@/features/LiveFeed';
 import { Chat } from '@/features/Chat';
-import { OwnerMode } from '@/features/OwnerMode';
+import { BusinessDashboard } from '@/features/BusinessDashboard';
 import { Auth } from '@/features/Auth';
 import { Profile } from '@/features/Profile';
 
