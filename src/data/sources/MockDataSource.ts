@@ -313,16 +313,34 @@ export class MockDataSource implements IDataSource {
 
   async listTodayPosts(venueId?: string): Promise<Post[]> {
     await new Promise(resolve => setTimeout(resolve, 150));
-    
-    let posts = SEED_POSTS.filter(p => 
-      p.status === 'approved' && 
-      new Date(p.expires_at) > new Date()
+
+    // Merge seed posts with IndexedDB-persisted owner posts
+    let posts: Post[] = SEED_POSTS.filter(p =>
+      p.status === 'approved' && new Date(p.expires_at) > new Date()
     );
-    
-    if (venueId) {
-      posts = posts.filter(p => p.venue_id === venueId);
+
+    try {
+      const persisted = await loadPersistedPosts();
+      const persistedAsPosts: Post[] = persisted.map(p => ({
+        id: p.id,
+        venue_id: p.venue_id,
+        media_url: p.media_url,
+        thumb_url: p.media_url,
+        media_type: 'image' as const,
+        created_at: p.created_at,
+        expires_at: p.expires_at,
+        status: 'approved' as const,
+        has_faces: true,
+        faces_blurred: true,
+        moderation_flag: 'none' as const,
+      }));
+      // Prepend so newest owner post shows first
+      posts = [...persistedAsPosts, ...posts];
+    } catch {
+      // IndexedDB unavailable — proceed with seed posts only
     }
-    
+
+    if (venueId) posts = posts.filter(p => p.venue_id === venueId);
     return posts;
   }
 
