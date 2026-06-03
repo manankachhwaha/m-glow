@@ -27,6 +27,7 @@ export function VenueDetail({ venueId, onBack, onOpenChat }: VenueDetailProps) {
     try {
       const detail = await dataSource.getVenue(venueId);
       setVenueDetail(detail);
+      recordVisit(venueId, detail.venue.name);
       
       const favorites = await dataSource.getFavorites();
       setIsFavorite(favorites.includes(venueId));
