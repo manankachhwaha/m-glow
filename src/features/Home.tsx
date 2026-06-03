@@ -346,14 +346,56 @@ export function Home({ onVenueClick, onOpenChat }: HomeProps) {
       {/* Nightclub-themed Content */}
       <div className="relative z-10 px-4">
         {viewMode === 'map' ? (
-          // Google Maps with Real Venue Locations
-          <div className="my-4">
+          <div className="my-4 space-y-3">
+            {/* Map — venues filtered to the selected radius */}
             <LeafletMapView
-              venues={venues}
+              venues={venues.filter(v => {
+                if (!v.lat || !v.lng) return false;
+                const center = userLocation ?? { lat: 19.076, lng: 72.8777 };
+                return calculateDistance(center.lat, center.lng, v.lat, v.lng) <= radiusKm;
+              })}
               onVenueClick={onVenueClick}
               userLocation={userLocation}
+              radiusKm={radiusKm}
               className="h-96"
             />
+
+            {/* Radius slider */}
+            <div className="px-1 pb-1">
+              <style>{`
+                .radius-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 2px; outline: none; cursor: pointer; background: transparent; }
+                .radius-slider::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(to right, #ff2d78 0%, #ff2d78 var(--pct,50%), rgba(255,255,255,0.12) var(--pct,50%), rgba(255,255,255,0.12) 100%); }
+                .radius-slider::-moz-range-track { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.12); }
+                .radius-slider::-moz-range-progress { height: 4px; border-radius: 2px; background: #ff2d78; }
+                .radius-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #ff2d78; border: 2px solid rgba(255,255,255,0.4); box-shadow: 0 0 12px rgba(255,45,120,0.7), 0 0 24px rgba(255,45,120,0.3); margin-top: -9px; cursor: pointer; transition: box-shadow 0.15s; }
+                .radius-slider::-webkit-slider-thumb:hover { box-shadow: 0 0 18px rgba(255,45,120,0.9), 0 0 32px rgba(255,45,120,0.5); }
+                .radius-slider::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #ff2d78; border: 2px solid rgba(255,255,255,0.4); box-shadow: 0 0 12px rgba(255,45,120,0.7); cursor: pointer; }
+              `}</style>
+
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-white/50 font-medium tracking-wide uppercase">Radius</span>
+                <span className="text-sm font-bold tabular-nums" style={{ color: '#ff2d78', textShadow: '0 0 10px rgba(255,45,120,0.6)' }}>
+                  {radiusKm === 0 ? 'All' : `${radiusKm} km`}
+                </span>
+              </div>
+
+              <input
+                type="range"
+                min={0}
+                max={10}
+                step={0.5}
+                value={radiusKm}
+                className="radius-slider"
+                style={{ '--pct': `${radiusKm * 10}%` } as React.CSSProperties}
+                onChange={e => setRadiusKm(Number(e.target.value))}
+              />
+
+              <div className="flex justify-between mt-1 text-white/30 text-xs px-0.5">
+                <span>0</span>
+                <span>5 km</span>
+                <span>10 km</span>
+              </div>
+            </div>
           </div>
         ) : (
           // List view
