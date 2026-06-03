@@ -10,6 +10,21 @@ async function loadModels() {
   modelsLoaded = true;
 }
 
+async function detectFaces(img: HTMLImageElement): Promise<faceapi.FaceDetection[]> {
+  // Try progressively larger input sizes — bigger sizes catch close-up/selfie faces better
+  const configs = [
+    new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.2 }),
+    new faceapi.TinyFaceDetectorOptions({ inputSize: 608, scoreThreshold: 0.15 }),
+    new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.1 }),
+  ];
+
+  for (const cfg of configs) {
+    const results = await faceapi.detectAllFaces(img, cfg);
+    if (results.length > 0) return results;
+  }
+  return [];
+}
+
 export async function simpleBlurFaces(imageFile: File): Promise<{
   blurredDataUrl: string;
   facesDetected: number;
@@ -35,12 +50,7 @@ export async function simpleBlurFaces(imageFile: File): Promise<{
 
   try {
     await loadModels();
-
-    const detections = await faceapi.detectAllFaces(
-      img,
-      new faceapi.TinyFaceDetectorOptions({ scoreThreshold: 0.3 })
-    );
-
+    const detections = await detectFaces(img);
     facesDetected = detections.length;
 
     for (const det of detections) {
@@ -51,7 +61,7 @@ export async function simpleBlurFaces(imageFile: File): Promise<{
       const bw = Math.min(canvas.width - bx, Math.ceil(width * (1 + 2 * pad)));
       const bh = Math.min(canvas.height - by, Math.ceil(height * (1 + 2 * pad)));
 
-      // Draw the face region into a temp canvas, then paint it back blurred
+      // Crop face region to temp canvas, then paint back blurred
       const faceCanvas = document.createElement('canvas');
       faceCanvas.width = bw;
       faceCanvas.height = bh;
@@ -59,12 +69,12 @@ export async function simpleBlurFaces(imageFile: File): Promise<{
       faceCtx.drawImage(img, bx, by, bw, bh, 0, 0, bw, bh);
 
       ctx.save();
-      ctx.filter = `blur(${Math.max(12, Math.round(width / 5))}px)`;
+      ctx.filter = `blur(${Math.max(14, Math.round(width / 4))}px)`;
       ctx.drawImage(faceCanvas, bx, by, bw, bh);
       ctx.restore();
     }
   } catch {
-    // Model load or detection failed — blur entire image as safety fallback
+    // Model failed — blur entire image as safety fallback
     ctx.filter = 'blur(20px)';
     ctx.drawImage(img, 0, 0);
     ctx.filter = 'none';
