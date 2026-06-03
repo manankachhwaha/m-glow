@@ -414,8 +414,8 @@ export function Home({ onVenueClick, onOpenChat }: HomeProps) {
 
         {viewMode === 'map' ? (
           <div className="my-4 space-y-3">
-            {/* Map — venues filtered to selected radius, centered on map center */}
-            <LeafletMapView
+            {/* Google Maps — venues filtered to selected radius */}
+            <GoogleMapView
               venues={venues.filter(v => {
                 if (!v.lat || !v.lng || radiusKm === 0) return true;
                 const center = mapCenter ?? userLocation ?? { lat: 19.076, lng: 72.8777 };
