@@ -32,6 +32,7 @@ export function Home({ onVenueClick, onOpenChat }: HomeProps) {
   const [priceFilter, setPriceFilter] = useState<PriceLevel | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [radiusKm, setRadiusKm] = useState(5);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
   const touchStartY = useRef(0);
