@@ -23,7 +23,7 @@ export function VenueDetail({ venueId, onBack, onOpenChat }: VenueDetailProps) {
 
   useEffect(() => {
     loadVenueDetail();
-  }, [venueId]);
+  }, [loadVenueDetail]);
 
   const loadVenueDetail = useCallback(async () => {
     setLoading(true);
