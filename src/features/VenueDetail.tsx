@@ -36,6 +36,10 @@ export function VenueDetail({ venueId, onBack, onOpenChat }: VenueDetailProps) {
     }
   }, [venueId]);
 
+  useEffect(() => {
+    loadVenueDetail();
+  }, [loadVenueDetail]);
+
   const handleToggleFavorite = async () => {
     try {
       const newState = await dataSource.toggleFavorite(venueId);
