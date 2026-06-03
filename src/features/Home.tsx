@@ -121,31 +121,22 @@ export function Home({ onVenueClick, onOpenChat }: HomeProps) {
     return () => window.removeEventListener('venue-post-uploaded', handler);
   }, [loadVenues]);
 
-  // Get user location
+  // Get user location + reverse geocode for the label
   useEffect(() => {
+    const fallback = { lat: 19.0760, lng: 72.8777 };
+    const applyLocation = async (coords: { lat: number; lng: number }) => {
+      setUserLocation(coords);
+      const label = await reverseGeocode(coords.lat, coords.lng);
+      setLocationLabel(label);
+    };
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          });
-        },
-        (error) => {
-          console.log('Location access denied or failed:', error);
-          // Use default Mumbai location
-          setUserLocation({
-            lat: 19.0760,
-            lng: 72.8777
-          });
-        }
+        pos => applyLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => applyLocation(fallback)
       );
     } else {
-      // Use default Mumbai location
-      setUserLocation({
-        lat: 19.0760,
-        lng: 72.8777
-      });
+      applyLocation(fallback);
     }
   }, []);
 
