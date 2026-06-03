@@ -1,7 +1,7 @@
 // Nightclub-Themed Home Screen - Map & List View
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Search, MapPin, List, Filter, RefreshCw } from 'lucide-react';
+import { Search, MapPin, List, Filter, RefreshCw, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { VenueCard } from '@/ui/VenueCard';
 import { CrowdFilter, TypeFilter, PriceFilter } from '@/ui/FilterChips';
@@ -10,6 +10,24 @@ import { RealDiscoBall } from '@/components/RealDiscoBall';
 import { useAudio } from '@/hooks/use-audio';
 import type { Venue, CrowdLevel, VenueType, PriceLevel } from '@/data/models';
 import { calculateDistance } from '@/utils/time';
+
+async function reverseGeocode(lat: number, lng: number): Promise<string> {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+      { headers: { 'Accept-Language': 'en' } }
+    );
+    const data = await res.json();
+    const a = data.address ?? {};
+    const neighbourhood = a.neighbourhood || a.suburb || a.quarter || a.village || a.town || '';
+    const city = a.city || a.county || a.state_district || a.state || '';
+    if (neighbourhood && city) return `${neighbourhood}, ${city}`;
+    if (city) return city;
+    return data.display_name?.split(',')[0] ?? 'your area';
+  } catch {
+    return 'your area';
+  }
+}
 
 // Real-time features removed for simplification
 
