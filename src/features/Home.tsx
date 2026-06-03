@@ -5,8 +5,7 @@ import { Search, MapPin, List, Filter, Music, Volume2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { VenueCard } from '@/ui/VenueCard';
 import { CrowdFilter, TypeFilter, PriceFilter } from '@/ui/FilterChips';
-import { MapView } from '@/components/MapView';
-import { GoogleMapView } from '@/components/GoogleMapView';
+import { LeafletMapView } from '@/components/LeafletMapView';
 import { RealDiscoBall } from '@/components/RealDiscoBall';
 import { useAudio } from '@/hooks/use-audio';
 import type { Venue, CrowdLevel, VenueType, PriceLevel } from '@/data/models';
@@ -294,7 +293,7 @@ export function Home({ onVenueClick }: HomeProps) {
         {viewMode === 'map' ? (
           // Google Maps with Real Venue Locations
           <div className="my-4">
-            <GoogleMapView 
+            <LeafletMapView
               venues={venues}
               onVenueClick={onVenueClick}
               userLocation={userLocation}
