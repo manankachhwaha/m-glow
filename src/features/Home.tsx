@@ -372,19 +372,38 @@ export function Home({ onVenueClick, onOpenChat }: HomeProps) {
 
       {/* Nightclub-themed Content */}
       <div className="relative z-10 px-4">
+        {/* Vibe banner */}
+        {vibeArea && viewMode === 'list' && (
+          <div className="relative z-10 mx-4 mt-3 px-4 py-2.5 rounded-2xl flex items-center justify-between"
+            style={{ background: 'rgba(0,245,255,0.08)', border: '1px solid rgba(0,245,255,0.25)', backdropFilter: 'blur(12px)' }}>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#00F5FF' }} />
+              <span className="text-sm font-medium" style={{ color: '#00F5FF' }}>
+                Showing vibes near <span className="font-bold">{vibeArea}</span>
+              </span>
+            </div>
+            <button onClick={() => { setVibeArea(null); setVibeVenues(null); }}
+              className="p-1 rounded-lg hover:bg-white/10 transition-all">
+              <X className="w-4 h-4 text-white/50" />
+            </button>
+          </div>
+        )}
+
         {viewMode === 'map' ? (
           <div className="my-4 space-y-3">
-            {/* Map — venues filtered to the selected radius */}
+            {/* Map — venues filtered to selected radius, centered on map center */}
             <LeafletMapView
               venues={venues.filter(v => {
-                if (!v.lat || !v.lng) return false;
-                const center = userLocation ?? { lat: 19.076, lng: 72.8777 };
+                if (!v.lat || !v.lng || radiusKm === 0) return true;
+                const center = mapCenter ?? userLocation ?? { lat: 19.076, lng: 72.8777 };
                 return calculateDistance(center.lat, center.lng, v.lat, v.lng) <= radiusKm;
               })}
               onVenueClick={onVenueClick}
-              userLocation={userLocation}
               radiusKm={radiusKm}
-              className="h-96"
+              gender={gender}
+              onCenterChange={(lat, lng) => setMapCenter({ lat, lng })}
+              initialCenter={userLocation ?? undefined}
+              className="h-[420px]"
             />
 
             {/* Radius slider */}
