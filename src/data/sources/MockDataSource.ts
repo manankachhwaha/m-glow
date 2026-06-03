@@ -291,8 +291,9 @@ export class MockDataSource implements IDataSource {
 
   async getVenue(id: string): Promise<VenueDetail> {
     await new Promise(resolve => setTimeout(resolve, 200));
-    
-    const venue = SEED_VENUES.find(v => v.id === id);
+
+    const allVenues = [...SEED_VENUES, ...loadOwnerVenuesAsVenues()];
+    const venue = allVenues.find(v => v.id === id);
     if (!venue) throw new Error('Venue not found');
     
     const todayPosts = SEED_POSTS.filter(p => 
