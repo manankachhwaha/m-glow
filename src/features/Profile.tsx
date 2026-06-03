@@ -472,24 +472,46 @@ export function Profile({ onLogout }: ProfileProps) {
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold">My Favorites</h3>
-                <p className="text-sm text-muted-foreground">View your saved venues</p>
+                <p className="text-sm text-muted-foreground">
+                  {favCount === 0 ? 'No saved venues yet' : `${favCount} saved venue${favCount !== 1 ? 's' : ''}`}
+                </p>
               </div>
-              <div className="text-2xl font-bold text-success">12</div>
+              <div className="text-2xl font-bold text-success">{favCount}</div>
             </div>
           </div>
 
           {/* Visit History */}
           <div className="glass-card rounded-3xl p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-warning/20 flex items-center justify-center">
+            <button
+              onClick={() => setShowHistory(h => !h)}
+              className="w-full flex items-center gap-3"
+            >
+              <div className="w-10 h-10 rounded-xl bg-warning/20 flex items-center justify-center flex-shrink-0">
                 <Clock className="w-5 h-5 text-warning" />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 text-left">
                 <h3 className="font-semibold">Visit History</h3>
-                <p className="text-sm text-muted-foreground">See where you've been</p>
+                <p className="text-sm text-muted-foreground">
+                  {visitHistory.length === 0 ? 'No visits yet' : `${visitHistory.length} venue${visitHistory.length !== 1 ? 's' : ''} visited`}
+                </p>
               </div>
-              <div className="text-2xl font-bold text-warning">8</div>
-            </div>
+              <div className="flex items-center gap-2">
+                <div className="text-2xl font-bold text-warning">{visitHistory.length}</div>
+                {visitHistory.length > 0 && (showHistory ? <ChevronUp className="w-4 h-4 text-white/40" /> : <ChevronDown className="w-4 h-4 text-white/40" />)}
+              </div>
+            </button>
+            {showHistory && visitHistory.length > 0 && (
+              <div className="mt-3 space-y-2 max-h-48 overflow-y-auto">
+                {visitHistory.slice(0, 20).map((v, i) => (
+                  <div key={i} className="flex items-center justify-between py-2 border-t border-white/5">
+                    <span className="text-sm text-white/80">{v.venue_name}</span>
+                    <span className="text-xs text-white/40">
+                      {new Date(v.visited_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
