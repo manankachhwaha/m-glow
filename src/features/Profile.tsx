@@ -24,12 +24,15 @@ export function Profile({ onLogout }: ProfileProps) {
     setOwnerVenueId(localStorage.getItem('owner_venue_id') || '');
   }, []);
 
-  // Load venue list when business mode is on
+  // Load only the owner's own venues when business mode is on
   useEffect(() => {
     if (!isBusinessMode) return;
-    dataSource.listVenues({ lat: 19.076, lng: 72.8777 }).then(venues => {
-      setAvailableVenues(venues.map(v => ({ id: v.id, name: v.name })));
-    });
+    try {
+      const raw: { id: string; name: string }[] = JSON.parse(localStorage.getItem('owner_venues') || '[]');
+      setAvailableVenues(raw.map(v => ({ id: v.id, name: v.name })));
+    } catch {
+      setAvailableVenues([]);
+    }
   }, [isBusinessMode]);
   
   // Profile data
