@@ -377,18 +377,17 @@ export function GoogleMapView({
       {status === 'ready' && (
         <div className="absolute bottom-10 left-3 z-10 p-3 rounded-xl text-xs space-y-1"
           style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(12px)',
-                   border: `1px solid rgba(0,245,255,0.15)` }}>
-          <div className="font-semibold mb-1" style={{ color: CYAN }}>Live Venues</div>
+                   border: '1px solid rgba(0,0,0,0.1)', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
+          <div className="font-semibold mb-1 text-gray-700">Live Venues</div>
           {[['#ff0080','Busy'],['#ff8800','Moderate'],['#00ff88','Quiet']].map(([c,l]) => (
             <div key={l} className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full" style={{ background: c }} />
-              <span className="text-white/70">{l}</span>
+              <span className="text-gray-600">{l}</span>
             </div>
           ))}
-          <div className="flex items-center gap-2 pt-1 mt-1"
-            style={{ borderTop: `1px solid rgba(0,245,255,0.2)` }}>
+          <div className="flex items-center gap-2 pt-1 mt-1 border-t border-gray-200">
             <div className="w-2 h-2 rounded-full" style={{ background: CYAN }} />
-            <span className="text-white/70">Radar range</span>
+            <span className="text-gray-600">Radar range</span>
           </div>
         </div>
       )}
