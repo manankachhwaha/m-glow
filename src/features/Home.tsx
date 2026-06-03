@@ -16,26 +16,23 @@ const dataSource = new MockDataSource();
 
 interface HomeProps {
   onVenueClick?: (venueId: string) => void;
+  onOpenChat?: (venueId: string, venueName: string) => void;
 }
 
-export function Home({ onVenueClick }: HomeProps) {
+export function Home({ onVenueClick, onOpenChat }: HomeProps) {
   const [venues, setVenues] = useState<Venue[]>([]);
+  const [latestPostUrls, setLatestPostUrls] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
-  // Button sounds disabled
-  // const { playButtonClick } = useAudio();
-  
+
   // Filters
   const [crowdFilter, setCrowdFilter] = useState<CrowdLevel | null>(null);
   const [typeFilter, setTypeFilter] = useState<VenueType | null>(null);
   const [priceFilter, setPriceFilter] = useState<PriceLevel | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  
-  // Real-time features
-  // Real-time features removed for simplification
 
   const loadVenues = useCallback(async () => {
     setLoading(true);
