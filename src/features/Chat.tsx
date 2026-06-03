@@ -79,7 +79,7 @@ export function Chat({ venueId, venueName, onBack }: ChatProps) {
     } catch (err) {
       console.error('Failed to initialize chat:', err);
     }
-  };
+  }, [venueId]);
 
   const sendMessage = async (text: string) => {
     if (!text.trim() || sending || !venueDetail) return;
