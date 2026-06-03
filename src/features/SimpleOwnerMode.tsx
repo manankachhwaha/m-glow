@@ -217,11 +217,11 @@ export function SimpleOwnerMode() {
         <div className="mt-8 bg-blue-500/10 border border-blue-400/30 rounded-xl p-4">
           <h3 className="text-blue-300 font-medium mb-2">How it works:</h3>
           <ul className="text-blue-400 text-sm space-y-1">
-            <li>• Click "Select Photo" to choose an image</li>
-            <li>• Image is processed for privacy protection</li>
-            <li>• Preview the processed image</li>
-            <li>• Click "Upload Photo" to submit to your venue</li>
-            <li>• All processing happens in your browser (privacy-safe)</li>
+            <li>• Tap "Take Photo" to open your camera</li>
+            <li>• Faces are automatically detected and blurred</li>
+            <li>• Preview the privacy-protected image</li>
+            <li>• Tap "Upload Photo" to post to your venue</li>
+            <li>• All processing happens on-device — nothing leaves your phone until upload</li>
           </ul>
         </div>
       </div>
