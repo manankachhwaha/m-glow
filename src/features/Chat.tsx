@@ -1,10 +1,11 @@
-// Chat Screen with Smart FAQ
+// Chat Screen — Claude AI venue assistant
 
 import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Send, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { Message, FaqItem } from '@/data/models';
+import type { Message, FaqItem, VenueDetail } from '@/data/models';
 import { MockDataSource } from '@/data/sources/MockDataSource';
+import { getClaudeResponse, type ClaudeMessage } from '@/utils/claude';
 
 const dataSource = new MockDataSource();
 
@@ -14,13 +15,40 @@ interface ChatProps {
   onBack: () => void;
 }
 
+function buildSystemPrompt(venue: VenueDetail, faqs: FaqItem[]): string {
+  const priceLabel =
+    venue.venue.price_level === 3 ? 'Premium (₹₹₹)' :
+    venue.venue.price_level === 2 ? 'Mid-range (₹₹)' : 'Budget-friendly (₹)';
+
+  const faqBlock = faqs.length
+    ? faqs.map(f => `Q: ${f.question}\nA: ${f.answer}`).join('\n\n')
+    : 'No FAQ data available.';
+
+  return `You are a friendly and knowledgeable assistant for ${venue.venue.name}, a ${venue.venue.type} located at ${venue.venue.address}, Mumbai.
+
+Opening hours: ${venue.venue.open_hours ?? 'Not specified'}
+Price level: ${priceLabel}
+Current crowd: ${venue.current_crowd}
+
+Frequently asked questions:
+${faqBlock}
+
+Answer guest questions helpfully and concisely (1–3 sentences). If you are unsure about something not covered above, say you will check with the manager. Stay friendly and on-topic for this venue.`;
+}
+
+function makeId() {
+  return `msg_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+}
+
 export function Chat({ venueId, venueName, onBack }: ChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [claudeHistory, setClaudeHistory] = useState<ClaudeMessage[]>([]);
+  const [venueDetail, setVenueDetail] = useState<VenueDetail | null>(null);
+  const [faqItems, setFaqItems] = useState<FaqItem[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
-  const [chatId, setChatId] = useState<string | null>(null);
-  const [faqItems, setFaqItems] = useState<FaqItem[]>([]);
   const [showFaq, setShowFaq] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,41 +56,82 @@ export function Chat({ venueId, venueName, onBack }: ChatProps) {
   }, [venueId]);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }, [messages]);
 
   const initializeChat = async () => {
     try {
-      const id = await dataSource.createChat(venueId);
-      setChatId(id);
-      
-      const msgs = await dataSource.getMessages(id);
-      setMessages(msgs);
-      
-      const faqs = await dataSource.listFaq(venueId);
+      const [detail, faqs] = await Promise.all([
+        dataSource.getVenue(venueId),
+        dataSource.listFaq(venueId),
+      ]);
+      setVenueDetail(detail);
       setFaqItems(faqs);
-    } catch (error) {
-      console.error('Failed to initialize chat:', error);
+
+      const welcome: Message = {
+        id: makeId(),
+        chat_id: venueId,
+        sender: 'bot',
+        text: `Hi! I'm the assistant for ${detail.venue.name}. Ask me anything — parking, cover charges, hours, dress code, and more.`,
+        created_at: new Date().toISOString(),
+      };
+      setMessages([welcome]);
+    } catch (err) {
+      console.error('Failed to initialize chat:', err);
     }
   };
 
   const sendMessage = async (text: string) => {
-    if (!chatId || !text.trim() || sending) return;
+    if (!text.trim() || sending || !venueDetail) return;
 
+    const trimmed = text.trim();
     setSending(true);
     setNewMessage('');
     setShowFaq(false);
+    setError(null);
+
+    const userMsg: Message = {
+      id: makeId(),
+      chat_id: venueId,
+      sender: 'guest',
+      text: trimmed,
+      created_at: new Date().toISOString(),
+    };
+    setMessages(prev => [...prev, userMsg]);
+
+    const updatedHistory: ClaudeMessage[] = [
+      ...claudeHistory,
+      { role: 'user', content: trimmed },
+    ];
 
     try {
-      await dataSource.createMessage(chatId, text.trim());
-      const updatedMessages = await dataSource.getMessages(chatId);
-      setMessages(updatedMessages);
-    } catch (error) {
-      console.error('Failed to send message:', error);
+      const systemPrompt = buildSystemPrompt(venueDetail, faqItems);
+      const reply = await getClaudeResponse(systemPrompt, updatedHistory);
+
+      const botMsg: Message = {
+        id: makeId(),
+        chat_id: venueId,
+        sender: 'bot',
+        text: reply,
+        created_at: new Date().toISOString(),
+      };
+
+      setMessages(prev => [...prev, botMsg]);
+      setClaudeHistory([
+        ...updatedHistory,
+        { role: 'assistant', content: reply },
+      ]);
+    } catch (err) {
+      console.error('Claude API error:', err);
+      setError('Could not get a response. Please check your API key or try again.');
+      const errMsg: Message = {
+        id: makeId(),
+        chat_id: venueId,
+        sender: 'bot',
+        text: 'Sorry, I\'m having trouble connecting right now. Please try again in a moment.',
+        created_at: new Date().toISOString(),
+      };
+      setMessages(prev => [...prev, errMsg]);
     } finally {
       setSending(false);
     }
@@ -71,10 +140,6 @@ export function Chat({ venueId, venueName, onBack }: ChatProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     sendMessage(newMessage);
-  };
-
-  const handleFaqClick = (faq: FaqItem) => {
-    sendMessage(faq.question);
   };
 
   return (
@@ -89,12 +154,15 @@ export function Chat({ venueId, venueName, onBack }: ChatProps) {
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            
+
             <div className="flex-1">
               <h1 className="font-semibold">{venueName}</h1>
-              <p className="text-sm text-muted-foreground">Chat with venue</p>
+              <p className="text-sm text-muted-foreground flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse" />
+                Claude AI assistant
+              </p>
             </div>
-            
+
             <button
               onClick={() => setShowFaq(!showFaq)}
               className={cn(
@@ -116,7 +184,7 @@ export function Chat({ venueId, venueName, onBack }: ChatProps) {
             {faqItems.slice(0, 4).map((faq) => (
               <button
                 key={faq.id}
-                onClick={() => handleFaqClick(faq)}
+                onClick={() => sendMessage(faq.question)}
                 className="flex-shrink-0 px-3 py-2 rounded-full glass-light text-sm hover:bg-primary/10 transition-smooth"
               >
                 {faq.question}
@@ -126,20 +194,31 @@ export function Chat({ venueId, venueName, onBack }: ChatProps) {
         </div>
       )}
 
+      {error && (
+        <div className="mx-4 mt-2 px-3 py-2 rounded-xl bg-destructive/10 text-destructive text-xs">
+          {error}
+        </div>
+      )}
+
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
         <div className="space-y-4">
           {messages.map((message) => (
             <MessageBubble key={message.id} message={message} />
           ))}
-          
+
           {sending && (
-            <div className="flex justify-end">
-              <div className="bg-primary/20 text-primary px-4 py-2 rounded-2xl rounded-br-md max-w-xs">
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-current rounded-full animate-bounce" />
-                  <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                  <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+            <div className="flex justify-start">
+              <div className="flex gap-2 max-w-xs">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 bg-secondary text-secondary-foreground">
+                  AI
+                </div>
+                <div className="glass-light px-4 py-3 rounded-2xl rounded-bl-md">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.15s' }} />
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.3s' }} />
+                  </div>
                 </div>
               </div>
             </div>
@@ -155,7 +234,7 @@ export function Chat({ venueId, venueName, onBack }: ChatProps) {
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type your message..."
+            placeholder="Ask about the venue..."
             disabled={sending}
             className="flex-1 px-4 py-3 bg-input border border-card-border/50 rounded-2xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-smooth"
           />
@@ -184,20 +263,18 @@ function MessageBubble({ message }: { message: Message }) {
   return (
     <div className={cn('flex', isUser ? 'justify-end' : 'justify-start')}>
       <div className={cn('flex gap-2 max-w-xs', isUser && 'flex-row-reverse')}>
-        {/* Avatar */}
         <div className={cn(
           'w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0',
-          isUser ? 'bg-primary text-primary-foreground' : 
+          isUser ? 'bg-primary text-primary-foreground' :
           isBot ? 'bg-secondary text-secondary-foreground' : 'bg-accent text-accent-foreground'
         )}>
-          {isUser ? 'U' : isBot ? '🤖' : 'M'}
+          {isUser ? 'U' : isBot ? 'AI' : 'M'}
         </div>
-        
-        {/* Message */}
+
         <div className={cn(
           'px-4 py-2 rounded-2xl',
-          isUser 
-            ? 'bg-primary text-primary-foreground rounded-br-md' 
+          isUser
+            ? 'bg-primary text-primary-foreground rounded-br-md'
             : 'glass-light rounded-bl-md'
         )}>
           <p className="text-sm">{message.text}</p>
@@ -208,7 +285,7 @@ function MessageBubble({ message }: { message: Message }) {
             {new Date(message.created_at).toLocaleTimeString('en-US', {
               hour: 'numeric',
               minute: '2-digit',
-              hour12: true
+              hour12: true,
             })}
           </p>
         </div>

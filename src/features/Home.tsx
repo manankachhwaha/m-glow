@@ -11,6 +11,7 @@ import { RealDiscoBall } from '@/components/RealDiscoBall';
 import { useAudio } from '@/hooks/use-audio';
 import type { Venue, CrowdLevel, VenueType, PriceLevel } from '@/data/models';
 import { MockDataSource } from '@/data/sources/MockDataSource';
+// Real-time features removed for simplification
 
 const dataSource = new MockDataSource();
 
@@ -33,6 +34,9 @@ export function Home({ onVenueClick }: HomeProps) {
   const [priceFilter, setPriceFilter] = useState<PriceLevel | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  
+  // Real-time features
+  // Real-time features removed for simplification
 
   const loadVenues = async () => {
     setLoading(true);
@@ -88,6 +92,8 @@ export function Home({ onVenueClick }: HomeProps) {
       });
     }
   }, []);
+
+  // Real-time features removed for simplification
 
   const handleToggleFavorite = async (venueId: string) => {
     try {
@@ -149,6 +155,14 @@ export function Home({ onVenueClick }: HomeProps) {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 bg-black/40 backdrop-blur-xl border border-white/20 rounded-2xl text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-pink-400/50 focus:border-pink-400/50 transition-all duration-300"
               />
+              
+              {/* Status Indicator */}
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-black/30 backdrop-blur-xl border border-white/10">
+                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
+                  <span className="text-xs text-white/80 font-medium">ONLINE</span>
+                </div>
+              </div>
             </div>
             
             <button
@@ -271,6 +285,8 @@ export function Home({ onVenueClick }: HomeProps) {
             </div>
           </div>
         )}
+        
+        {/* Live Updates Panel removed for simplification */}
       </div>
 
       {/* Nightclub-themed Content */}

@@ -72,7 +72,7 @@ export const useAudio = () => {
 
   return {
     isMusicEnabled: isActuallyPlaying, // Show the actual playing state
-    isPlaying: isActuallyPlaying,
+    isActuallyPlaying,
     isPaused,
     toggleMusic,
     enableMusic,

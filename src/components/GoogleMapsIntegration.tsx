@@ -8,9 +8,9 @@ import { MAPS_CONFIG, isGoogleMapsConfigured, getGoogleMapsScriptUrl } from '@/c
 // Google Maps type declarations
 declare global {
   interface Window {
-    google: any;
+    google: typeof google;
   }
-  const google: any;
+  const google: typeof google;
 }
 
 interface GoogleMapsIntegrationProps {
@@ -24,7 +24,7 @@ interface PlaceResult {
   formatted_address: string;
   rating: number;
   price_level?: number;
-  photos?: any[];
+  photos?: google.maps.places.PlacePhoto[];
   opening_hours?: {
     open_now: boolean;
   };
@@ -38,8 +38,8 @@ export function GoogleMapsIntegration({ onPlaceSelect, className }: GoogleMapsIn
   const [selectedPlace, setSelectedPlace] = useState<PlaceResult | null>(null);
   const [isConfigured, setIsConfigured] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
-  const [map, setMap] = useState<any>(null);
-  const [service, setService] = useState<any>(null);
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [service, setService] = useState<google.maps.places.PlacesService | null>(null);
 
   // Check if Google Maps is properly configured
   useEffect(() => {
@@ -94,9 +94,9 @@ export function GoogleMapsIntegration({ onPlaceSelect, className }: GoogleMapsIn
         radius: MAPS_CONFIG.SEARCH_RADIUS
       };
 
-      service.textSearch(request, (results: any, status: any) => {
+      service.textSearch(request, (results: google.maps.places.PlaceResult[] | null, status: google.maps.places.PlacesServiceStatus) => {
         if (status === 'OK' && results) {
-          const places: PlaceResult[] = results.map((place: any) => ({
+          const places: PlaceResult[] = results.map((place: google.maps.places.PlaceResult) => ({
             place_id: place.place_id,
             name: place.name,
             formatted_address: place.formatted_address,
@@ -127,7 +127,7 @@ export function GoogleMapsIntegration({ onPlaceSelect, className }: GoogleMapsIn
         fields: ['geometry']
       };
       
-      service?.getDetails(request, (result: any, status: any) => {
+      service?.getDetails(request, (result: google.maps.places.PlaceResult | null, status: google.maps.places.PlacesServiceStatus) => {
         if (status === 'OK' && result?.geometry?.location) {
           map.setCenter(result.geometry.location);
           map.setZoom(16);

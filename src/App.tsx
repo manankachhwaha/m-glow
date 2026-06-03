@@ -11,12 +11,12 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const App = () => {
-  const { isMusicEnabled, toggleMusic } = useAudio();
+  const { isActuallyPlaying, isPaused, toggleMusic } = useAudio();
 
   // Handle music toggle with backend-controlled music
   const handleMusicToggle = () => {
     console.log('🎮 Music button clicked!');
-    console.log('🎮 Current music state:', isMusicEnabled);
+    console.log('🎮 Current music state:', { isActuallyPlaying, isPaused });
     toggleMusic();
   };
 
@@ -39,17 +39,17 @@ const App = () => {
             className={`
               group relative w-14 h-14 rounded-full backdrop-blur-xl border-2 transition-all duration-500 
               hover:scale-110 active:scale-95 transform-gpu shadow-2xl
-              ${isMusicEnabled 
+              ${isActuallyPlaying 
                 ? 'bg-gradient-to-br from-neon-cyan/40 to-neon-blue/30 border-neon-cyan/70 shadow-[0_0_25px_rgba(6,182,212,0.5)] hover:shadow-[0_0_35px_rgba(6,182,212,0.7)]' 
                 : 'bg-gradient-to-br from-muted/50 to-muted/40 border-card-border/70 hover:border-neon-pink/70 hover:shadow-[0_0_20px_rgba(236,72,153,0.4)]'
               }
             `}
-            title={isMusicEnabled ? 'Pause Music' : 'Play Music'}
+            title={isActuallyPlaying ? 'Pause Music' : 'Play Music'}
           >
             {/* Animated background glow */}
             <div className={`
               absolute inset-0 rounded-full transition-all duration-500
-              ${isMusicEnabled 
+              ${isActuallyPlaying 
                 ? 'bg-gradient-to-br from-neon-cyan/20 to-neon-blue/20 animate-pulse' 
                 : 'bg-gradient-to-br from-muted/10 to-muted/5'
               }
@@ -57,7 +57,7 @@ const App = () => {
             
             {/* Fancy Icon */}
             <div className="relative z-10 flex items-center justify-center w-full h-full">
-              {isMusicEnabled ? (
+              {isActuallyPlaying ? (
                 // Fancy Pause Icon
                 <div className="relative">
                   <svg 
@@ -67,7 +67,7 @@ const App = () => {
                     fill="none" 
                     className={`
                       transition-all duration-300
-                      ${isMusicEnabled ? 'text-neon-cyan drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]' : 'text-muted-foreground'}
+                      ${isActuallyPlaying ? 'text-neon-cyan drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]' : 'text-muted-foreground'}
                     `}
                   >
                     <rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor" />
@@ -87,7 +87,7 @@ const App = () => {
                     fill="none" 
                     className={`
                       transition-all duration-300 ml-0.5
-                      ${isMusicEnabled ? 'text-neon-cyan' : 'text-neon-pink drop-shadow-[0_0_8px_rgba(236,72,153,0.8)]'}
+                      ${isActuallyPlaying ? 'text-neon-cyan' : 'text-neon-pink drop-shadow-[0_0_8px_rgba(236,72,153,0.8)]'}
                     `}
                   >
                     <path 
@@ -105,7 +105,7 @@ const App = () => {
             {/* Status indicator */}
             <div className={`
               absolute -top-1 -right-1 w-3 h-3 rounded-full transition-all duration-300
-              ${isMusicEnabled 
+              ${isActuallyPlaying 
                 ? 'bg-neon-cyan shadow-[0_0_10px_rgba(6,182,212,0.8)] animate-pulse' 
                 : 'bg-muted-foreground/50'
               }

@@ -1,6 +1,6 @@
 // Main CrowdSphere App with Navigation
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Home as HomeIcon, Zap, MessageSquare, User, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Home } from '@/features/Home';
@@ -23,6 +23,26 @@ interface ScreenState {
 export default function CrowdSphere() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [screenState, setScreenState] = useState<ScreenState>({ current: 'auth' });
+  const [isBusinessMode, setIsBusinessMode] = useState(false);
+
+  // Load business mode from localStorage
+  useEffect(() => {
+    const businessMode = localStorage.getItem('business-mode');
+    if (businessMode === 'true') {
+      setIsBusinessMode(true);
+    }
+  }, []);
+
+  // Listen for business mode changes
+  useEffect(() => {
+    const handleBusinessModeChange = () => {
+      const businessMode = localStorage.getItem('business-mode');
+      setIsBusinessMode(businessMode === 'true');
+    };
+
+    window.addEventListener('storage', handleBusinessModeChange);
+    return () => window.removeEventListener('storage', handleBusinessModeChange);
+  }, []);
 
   const handleAuth = () => {
     setIsAuthenticated(true);
@@ -63,6 +83,7 @@ export default function CrowdSphere() {
         return <LiveFeed onVenueClick={navigateToVenue} />;
       
       case 'owner':
+        console.log('🎯 Rendering OwnerMode component!');
         return <OwnerMode />;
       
       case 'venue-detail':
@@ -116,12 +137,17 @@ export default function CrowdSphere() {
               isActive={screenState.current === 'feed'}
               onClick={() => navigateToScreen('feed')}
             />
-            <NavButton
-              icon={Upload}
-              label="Owner"
-              isActive={screenState.current === 'owner'}
-              onClick={() => navigateToScreen('owner')}
-            />
+            {isBusinessMode && (
+              <NavButton
+                icon={Upload}
+                label="Owner"
+                isActive={screenState.current === 'owner'}
+                onClick={() => {
+                  console.log('🎯 Owner button clicked!');
+                  navigateToScreen('owner');
+                }}
+              />
+            )}
             <NavButton
               icon={User}
               label="Profile"

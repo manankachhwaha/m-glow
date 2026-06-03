@@ -1,6 +1,6 @@
 // Profile Screen with User Settings and Logout
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { LogOut, User, Settings, Heart, MapPin, Clock, Bell, Shield, HelpCircle, Edit3, Camera, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -13,6 +13,15 @@ export function Profile({ onLogout }: ProfileProps) {
   const [locationSharing, setLocationSharing] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [isBusinessMode, setIsBusinessMode] = useState(false);
+
+  // Load settings from localStorage
+  useEffect(() => {
+    const savedBusinessMode = localStorage.getItem('business-mode');
+    if (savedBusinessMode) {
+      setIsBusinessMode(savedBusinessMode === 'true');
+    }
+  }, []);
   
   // Profile data
   const [profileData, setProfileData] = useState({
@@ -29,6 +38,7 @@ export function Profile({ onLogout }: ProfileProps) {
     localStorage.removeItem('user-preferences');
     localStorage.removeItem('profile-data');
     localStorage.removeItem('anonymous-mode');
+    localStorage.removeItem('business-mode');
     
     // Call logout callback
     onLogout();
@@ -38,7 +48,15 @@ export function Profile({ onLogout }: ProfileProps) {
     // Save profile data to localStorage
     localStorage.setItem('profile-data', JSON.stringify(profileData));
     localStorage.setItem('anonymous-mode', isAnonymous.toString());
+    localStorage.setItem('business-mode', isBusinessMode.toString());
     setIsEditing(false);
+  };
+
+  const handleBusinessModeToggle = (enabled: boolean) => {
+    setIsBusinessMode(enabled);
+    localStorage.setItem('business-mode', enabled.toString());
+    // Trigger storage event for other components to listen
+    window.dispatchEvent(new Event('storage'));
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,22 +78,24 @@ export function Profile({ onLogout }: ProfileProps) {
       {/* Header */}
       <div className="px-6 py-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold bg-gradient-neon bg-clip-text text-transparent">
-            Profile
-          </h1>
+            <h1 className="text-2xl font-bold text-white">
+              Profile
+            </h1>
         </div>
 
         {/* User Info Card */}
         <div className="glass-card rounded-3xl p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Profile</h2>
+            <h2 className="text-xl font-bold text-white">Profile</h2>
             <button
               onClick={() => setIsEditing(!isEditing)}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl glass-light hover:scale-105 transition-smooth"
+              className="group flex items-center gap-3 px-4 py-3 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 backdrop-blur-xl border border-purple-400/20 hover:border-purple-400/40 transition-all duration-300 hover:scale-105"
             >
-              <Edit3 className="w-4 h-4" />
-              <span className="text-sm font-medium">
-                {isEditing ? 'Cancel' : 'Edit'}
+              <div className="w-6 h-6 rounded-xl bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
+                <Edit3 className="w-4 h-4 text-purple-400" />
+              </div>
+              <span className="text-white font-semibold text-sm">
+                {isEditing ? 'Cancel' : 'Edit Profile'}
               </span>
             </button>
           </div>
@@ -188,31 +208,39 @@ export function Profile({ onLogout }: ProfileProps) {
           )}
         </div>
 
-        {/* Settings Cards */}
+        {/* Settings */}
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-white mb-2">Settings</h2>
+          <p className="text-gray-300/80 font-medium">Manage your preferences</p>
+        </div>
+        
         <div className="space-y-4">
           {/* Notifications */}
-          <div className="glass-card rounded-3xl p-4">
+          <div className="rounded-3xl p-4 bg-black/5 backdrop-blur-xl border border-white/5 hover:border-white/10 transition-all duration-300" 
+               style={{ backdropFilter: 'blur(20px) saturate(180%)' }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 backdrop-blur-xl border border-primary/20 flex items-center justify-center">
                   <Bell className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold">Notifications</h3>
-                  <p className="text-sm text-muted-foreground">Get updates about venues and events</p>
+                  <h3 className="font-semibold text-white">Notifications</h3>
+                  <p className="text-sm text-gray-300/70">Get updates about venues</p>
                 </div>
               </div>
               <button
                 onClick={() => setNotifications(!notifications)}
                 className={cn(
                   'w-12 h-6 rounded-full transition-all duration-300',
+                  'backdrop-blur-xl border border-white/10',
                   notifications 
-                    ? 'bg-primary' 
-                    : 'bg-muted-foreground/30'
+                    ? 'bg-primary/80 shadow-[0_0_15px_rgba(236,72,153,0.3)]' 
+                    : 'bg-muted-foreground/20 hover:bg-muted-foreground/30'
                 )}
+                style={{ backdropFilter: 'blur(20px) saturate(180%)' }}
               >
                 <div className={cn(
-                  'w-5 h-5 bg-white rounded-full transition-transform duration-300',
+                  'w-5 h-5 bg-white rounded-full transition-transform duration-300 shadow-lg',
                   notifications ? 'translate-x-6' : 'translate-x-0.5'
                 )} />
               </button>
@@ -220,15 +248,16 @@ export function Profile({ onLogout }: ProfileProps) {
           </div>
 
           {/* Location Sharing */}
-          <div className="glass-card rounded-3xl p-4">
+          <div className="rounded-3xl p-4 bg-black/5 backdrop-blur-xl border border-white/5 hover:border-white/10 transition-all duration-300" 
+               style={{ backdropFilter: 'blur(20px) saturate(180%)' }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-secondary/20 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-2xl bg-secondary/10 backdrop-blur-xl border border-secondary/20 flex items-center justify-center">
                   <MapPin className="w-5 h-5 text-secondary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold">Location Sharing</h3>
-                  <p className="text-sm text-muted-foreground">Help us find nearby venues</p>
+                  <h3 className="font-semibold text-white">Location Sharing</h3>
+                  <p className="text-sm text-gray-300/70">Help find nearby venues</p>
                 </div>
               </div>
               <button
@@ -246,6 +275,50 @@ export function Profile({ onLogout }: ProfileProps) {
                 )} />
               </button>
             </div>
+          </div>
+
+          {/* Business Mode */}
+          <div className="rounded-3xl p-4 bg-black/5 backdrop-blur-xl border border-white/5 hover:border-white/10 transition-all duration-300" 
+               style={{ backdropFilter: 'blur(20px) saturate(180%)' }}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 backdrop-blur-xl border border-purple-400/20 flex items-center justify-center">
+                  <Settings className="w-5 h-5 text-purple-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-white">Business Mode</h3>
+                  <p className="text-sm text-gray-300/70">
+                    {isBusinessMode 
+                      ? 'Switch to business tools and venue management' 
+                      : 'Enable business features for venue owners'
+                    }
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => handleBusinessModeToggle(!isBusinessMode)}
+                className={cn(
+                  'w-12 h-6 rounded-full transition-all duration-300 relative',
+                  'backdrop-blur-xl border border-white/10',
+                  isBusinessMode 
+                    ? 'bg-gradient-to-r from-purple-500/80 to-pink-500/80 shadow-[0_0_15px_rgba(168,85,247,0.3)]' 
+                    : 'bg-muted-foreground/20 hover:bg-muted-foreground/30'
+                )}
+                style={{ backdropFilter: 'blur(20px) saturate(180%)' }}
+              >
+                <div className={cn(
+                  'absolute top-0.5 w-5 h-5 bg-white rounded-full transition-all duration-300 shadow-lg',
+                  isBusinessMode ? 'translate-x-6' : 'translate-x-0.5'
+                )} />
+              </button>
+            </div>
+            {isBusinessMode && (
+              <div className="mt-3 p-3 bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-2xl border border-purple-400/10 backdrop-blur-xl">
+                <p className="text-xs text-purple-300/90">
+                  🎉 Business mode activated! You now have access to venue management tools, upload features, and analytics.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Anonymous Chat */}
@@ -355,14 +428,16 @@ export function Profile({ onLogout }: ProfileProps) {
         <div className="mt-8">
           <button
             onClick={handleLogout}
-            className="w-full glass-card rounded-3xl p-4 flex items-center gap-3 hover:scale-[1.02] transition-smooth border-2 border-destructive/20 hover:border-destructive/40"
+            className="group w-full rounded-3xl p-6 bg-gradient-to-br from-red-500/10 to-orange-500/10 backdrop-blur-xl border border-red-400/20 hover:border-red-400/40 transition-all duration-300 hover:scale-[1.02]"
           >
-            <div className="w-10 h-10 rounded-xl bg-destructive/20 flex items-center justify-center">
-              <LogOut className="w-5 h-5 text-destructive" />
-            </div>
-            <div className="flex-1 text-left">
-              <h3 className="font-semibold text-destructive">Sign Out</h3>
-              <p className="text-sm text-muted-foreground">Log out of your account</p>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-red-500/20 flex items-center justify-center group-hover:bg-red-500/30 transition-colors">
+                <LogOut className="w-6 h-6 text-red-400" />
+              </div>
+              <div className="flex-1 text-left">
+                <h3 className="font-bold text-white text-lg">Sign Out</h3>
+                <p className="text-red-300/80 font-medium">Log out of your account</p>
+              </div>
             </div>
           </button>
         </div>

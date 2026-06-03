@@ -25,7 +25,7 @@ export const addAudioStateListener = (listener: (isPlaying: boolean, isPaused: b
 // Initialize audio context on first user interaction
 const initAudioContext = () => {
   if (!audioContext) {
-    audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
   }
   return audioContext;
 };
