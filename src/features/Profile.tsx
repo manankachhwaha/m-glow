@@ -337,10 +337,25 @@ export function Profile({ onLogout }: ProfileProps) {
               </button>
             </div>
             {isBusinessMode && (
-              <div className="mt-3 p-3 bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-2xl border border-purple-400/10 backdrop-blur-xl">
+              <div className="mt-3 p-3 bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-2xl border border-purple-400/10 backdrop-blur-xl space-y-3">
                 <p className="text-xs text-purple-300/90">
-                  🎉 Business mode activated! You now have access to venue management tools, upload features, and analytics.
+                  Business mode active — select your venue below to link your uploads.
                 </p>
+                <div>
+                  <label className="text-xs text-purple-300 font-medium flex items-center gap-1.5 mb-1.5">
+                    <Store className="w-3.5 h-3.5" /> Your Venue
+                  </label>
+                  <select
+                    value={ownerVenueId}
+                    onChange={(e) => handleVenueSelect(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-black/40 border border-purple-400/30 text-white text-sm focus:outline-none focus:border-purple-400/60"
+                  >
+                    <option value="">— Select your venue —</option>
+                    {availableVenues.map(v => (
+                      <option key={v.id} value={v.id}>{v.name}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
             )}
           </div>
