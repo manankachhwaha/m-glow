@@ -515,29 +515,45 @@ export function Profile({ onLogout }: ProfileProps) {
           </div>
         </div>
 
-        {/* Action Buttons */}
+        {/* App Preferences */}
         <div className="mt-8 space-y-4">
-          {/* Settings */}
-          <button className="w-full glass-card rounded-3xl p-4 flex items-center gap-3 hover:scale-[1.02] transition-smooth">
-            <div className="w-10 h-10 rounded-xl bg-muted/20 flex items-center justify-center">
-              <Settings className="w-5 h-5 text-muted-foreground" />
+          {/* Sound */}
+          <div className="rounded-3xl p-4 bg-black/5 backdrop-blur-xl border border-white/5"
+               style={{ backdropFilter: 'blur(20px) saturate(180%)' }}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 border border-cyan-400/20 flex items-center justify-center">
+                  <span className="text-lg">{soundEnabled ? '🎵' : '🔇'}</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-white">Background Music</h3>
+                  <p className="text-sm text-gray-300/70">{soundEnabled ? 'Playing nightclub vibes' : 'Music is off'}</p>
+                </div>
+              </div>
+              <button onClick={() => { const v = !soundEnabled; setSoundEnabled(v); savePreference('pref_sound', v); }}
+                className={cn('w-12 h-6 rounded-full transition-all duration-300 relative backdrop-blur-xl border border-white/10',
+                  soundEnabled ? 'bg-cyan-500/80 shadow-[0_0_15px_rgba(6,182,212,0.3)]' : 'bg-muted-foreground/20'
+                )}>
+                <div className={cn('absolute top-0.5 w-5 h-5 bg-white rounded-full transition-all duration-300 shadow-lg',
+                  soundEnabled ? 'translate-x-6' : 'translate-x-0.5')} />
+              </button>
             </div>
-            <div className="flex-1 text-left">
-              <h3 className="font-semibold">Settings</h3>
-              <p className="text-sm text-muted-foreground">App preferences</p>
-            </div>
-          </button>
+          </div>
 
           {/* Privacy */}
-          <button className="w-full glass-card rounded-3xl p-4 flex items-center gap-3 hover:scale-[1.02] transition-smooth">
-            <div className="w-10 h-10 rounded-xl bg-muted/20 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-muted-foreground" />
+          <div className="rounded-3xl p-4 bg-black/5 backdrop-blur-xl border border-white/5"
+               style={{ backdropFilter: 'blur(20px) saturate(180%)' }}>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-muted/20 flex items-center justify-center">
+                <Shield className="w-5 h-5 text-muted-foreground" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold">Privacy & Security</h3>
+                <p className="text-sm text-muted-foreground">Face blur is always on for uploads</p>
+              </div>
+              <span className="text-xs bg-green-500/10 text-green-400 border border-green-400/20 px-2 py-1 rounded-full">Active</span>
             </div>
-            <div className="flex-1 text-left">
-              <h3 className="font-semibold">Privacy & Security</h3>
-              <p className="text-sm text-muted-foreground">Manage your data</p>
-            </div>
-          </button>
+          </div>
 
           {/* Help */}
           <button className="w-full glass-card rounded-3xl p-4 flex items-center gap-3 hover:scale-[1.02] transition-smooth">
