@@ -1,6 +1,6 @@
 // Venue Detail Screen
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, Heart, MessageCircle, HelpCircle, Phone, Globe, MapPin, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CrowdBadge, PriceBadge, EleganceBadge } from '@/ui/Badge';
