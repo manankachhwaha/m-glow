@@ -309,10 +309,10 @@ export function Home({ onVenueClick, onOpenChat }: HomeProps) {
             </div>
           </div>
 
-          {/* Nightclub-themed location indicator */}
+          {/* Dynamic location label */}
           <div className="flex items-center gap-2 text-white/70 text-sm">
             <MapPin className="w-4 h-4 text-pink-400 drop-shadow-glow" />
-            <span className="text-white/80">Mumbai, Maharashtra</span>
+            <span className="text-white/80">{locationLabel}</span>
           </div>
           </div>
         </div>
