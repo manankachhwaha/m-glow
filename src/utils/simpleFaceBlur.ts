@@ -9,27 +9,32 @@ async function loadModels() {
   modelsLoaded = true;
 }
 
-// Pixelate a region — scale down to tiny, back up with no smoothing.
-// Guaranteed to work in all browsers, no CSS filter dependency.
-function pixelateRegion(
+/** Gaussian-style blur on a canvas region via temp canvas + CSS filter. */
+function blurRegion(
   ctx: CanvasRenderingContext2D,
-  src: HTMLImageElement | HTMLCanvasElement,
+  src: HTMLImageElement,
   x: number, y: number, w: number, h: number
 ) {
-  const blockSize = Math.max(10, Math.round(Math.min(w, h) / 6));
-  const tw = Math.max(1, Math.ceil(w / blockSize));
-  const th = Math.max(1, Math.ceil(h / blockSize));
+  const blurPx = Math.max(16, Math.round(Math.min(w, h) / 4));
 
+  // Draw just this face region into a small temp canvas with blur applied
   const tmp = document.createElement('canvas');
-  tmp.width = tw;
-  tmp.height = th;
+  // Add extra padding so blur doesn't clip at edges
+  const pad = blurPx * 2;
+  tmp.width = w + pad * 2;
+  tmp.height = h + pad * 2;
   const tc = tmp.getContext('2d')!;
-  tc.imageSmoothingEnabled = false;
-  tc.drawImage(src, x, y, w, h, 0, 0, tw, th);
+  tc.filter = `blur(${blurPx}px)`;
+  tc.drawImage(src, x - pad, y - pad, w + pad * 2, h + pad * 2, 0, 0, tmp.width, tmp.height);
+  tc.filter = 'none';
 
-  ctx.imageSmoothingEnabled = false;
-  ctx.drawImage(tmp, 0, 0, tw, th, x, y, w, h);
-  ctx.imageSmoothingEnabled = true;
+  // Clip to the face box when compositing back — avoids bleed
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x, y, w, h);
+  ctx.clip();
+  ctx.drawImage(tmp, 0, 0, tmp.width, tmp.height, x - pad, y - pad, tmp.width, tmp.height);
+  ctx.restore();
 }
 
 async function detectFaces(img: HTMLImageElement): Promise<faceapi.FaceDetection[]> {
@@ -78,23 +83,22 @@ export async function simpleBlurFaces(imageFile: File): Promise<BlurResult> {
     facesDetected = detections.length;
 
     if (facesDetected === 0) {
-      warning = 'No faces detected. If there are faces in the photo, try with better lighting or from a greater distance.';
+      warning = 'No faces detected — photo uploaded as-is.';
     }
 
     for (const det of detections) {
       const { x, y, width, height } = det.box;
-      const pad = 0.3;
+      const pad = 0.25;
       const bx = Math.max(0, Math.floor(x - width * pad));
       const by = Math.max(0, Math.floor(y - height * pad));
       const bw = Math.min(canvas.width - bx, Math.ceil(width * (1 + 2 * pad)));
       const bh = Math.min(canvas.height - by, Math.ceil(height * (1 + 2 * pad)));
-      pixelateRegion(ctx, img, bx, by, bw, bh);
+      blurRegion(ctx, img, bx, by, bw, bh);
     }
   } catch {
-    // Model failed — pixelate the whole image as a safe fallback
-    pixelateRegion(ctx, img, 0, 0, canvas.width, canvas.height);
+    // Model unavailable — return original, user sees unblurred photo
+    warning = 'Face detection unavailable. Photo uploaded without blur.';
     facesDetected = 0;
-    warning = 'Privacy protection applied to full image (face detection unavailable).';
   }
 
   URL.revokeObjectURL(objectUrl);
