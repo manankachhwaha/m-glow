@@ -24,20 +24,45 @@ interface ProfileProps {
 }
 
 export function Profile({ onLogout }: ProfileProps) {
-  const [notifications, setNotifications] = useState(true);
-  const [locationSharing, setLocationSharing] = useState(true);
+  const [notifications, setNotifications] = useState(() => localStorage.getItem('pref_notifications') !== 'false');
+  const [locationSharing, setLocationSharing] = useState(() => localStorage.getItem('pref_location') !== 'false');
+  const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('pref_sound') !== 'false');
   const [isEditing, setIsEditing] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [isBusinessMode, setIsBusinessMode] = useState(false);
   const [ownerVenueId, setOwnerVenueId] = useState('');
   const [availableVenues, setAvailableVenues] = useState<{ id: string; name: string }[]>([]);
+  const [gender, setGender] = useState<'male' | 'female'>(() =>
+    (localStorage.getItem('user_gender') as 'male' | 'female') ?? 'female'
+  );
+  const [favCount, setFavCount] = useState(0);
+  const [visitHistory, setVisitHistory] = useState<VisitRecord[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
 
   // Load settings from localStorage
   useEffect(() => {
     const savedBusinessMode = localStorage.getItem('business-mode');
     if (savedBusinessMode) setIsBusinessMode(savedBusinessMode === 'true');
     setOwnerVenueId(localStorage.getItem('owner_venue_id') || '');
+    setIsAnonymous(localStorage.getItem('anonymous-mode') === 'true');
   }, []);
+
+  // Load real favorites count
+  useEffect(() => {
+    dataSource.getFavorites().then(ids => setFavCount(ids.length)).catch(() => {});
+  }, []);
+
+  // Load visit history
+  useEffect(() => {
+    try {
+      const raw: VisitRecord[] = JSON.parse(localStorage.getItem('visit_history') || '[]');
+      setVisitHistory(raw);
+    } catch { /* ignore */ }
+  }, []);
+
+  const savePreference = (key: string, value: boolean) => {
+    localStorage.setItem(key, String(value));
+  };
 
   // Load only the owner's own venues when business mode is on
   useEffect(() => {
