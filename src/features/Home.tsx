@@ -78,13 +78,6 @@ export function Home({ onVenueClick, onOpenChat }: HomeProps) {
       const favs = await dataSource.getFavorites();
       setFavorites(new Set(favs));
 
-      // Build latest-post-per-venue map so cards show live photos
-      const posts = await dataSource.listTodayPosts();
-      const latest: Record<string, string> = {};
-      for (const post of posts) {
-        if (!latest[post.venue_id]) latest[post.venue_id] = post.media_url;
-      }
-      setLatestPostUrls(latest);
     } catch (error) {
       console.error('Failed to load venues:', error);
     } finally {
