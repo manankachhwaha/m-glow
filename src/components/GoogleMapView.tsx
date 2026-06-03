@@ -128,14 +128,22 @@ export function GoogleMapView({
 
   const center0 = initialCenter ?? MUMBAI;
 
-  // ── 1. Load Google Maps JS API ─────────────────────────────────────────────
+  // ── 1. Load Google Maps JS API (v2 uses importLibrary, not .load()) ─────────
   useEffect(() => {
     if (!API_KEY) { setApiError(true); return; }
-    import('@googlemaps/js-api-loader').then(({ Loader }) => {
-      new Loader({ apiKey: API_KEY, version: 'weekly', libraries: ['places', 'geocoding'] })
-        .load()
-        .then(() => setApiLoaded(true))
-        .catch(() => setApiError(true));
+    import('@googlemaps/js-api-loader').then(async ({ Loader }) => {
+      try {
+        const loader = new Loader({ apiKey: API_KEY, version: 'weekly' });
+        // Load all required libraries in parallel
+        await Promise.all([
+          loader.importLibrary('maps'),
+          loader.importLibrary('places'),
+          loader.importLibrary('geocoding'),
+        ]);
+        setApiLoaded(true);
+      } catch {
+        setApiError(true);
+      }
     });
   }, []);
 
