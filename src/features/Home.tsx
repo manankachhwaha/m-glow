@@ -442,6 +442,20 @@ export function Home({ onVenueClick, onOpenChat }: HomeProps) {
                 <span>10 km</span>
               </div>
             </div>
+
+            {/* Check Vibe button */}
+            <button
+              onClick={handleCheckVibe}
+              className="w-full py-4 rounded-2xl font-bold text-lg tracking-wide transition-all active:scale-95"
+              style={{
+                background: 'linear-gradient(135deg, #ff2d78 0%, #7B2FFF 100%)',
+                boxShadow: '0 0 24px rgba(255,45,120,0.5), 0 0 48px rgba(123,47,255,0.3)',
+                color: '#fff',
+                textShadow: '0 0 12px rgba(255,255,255,0.4)',
+              }}
+            >
+              Check Vibe 🔥
+            </button>
           </div>
         ) : (
           // List view
@@ -452,7 +466,7 @@ export function Home({ onVenueClick, onOpenChat }: HomeProps) {
                   <div key={i} className="h-64 rounded-3xl bg-black/40 backdrop-blur-xl border border-white/20 animate-pulse" />
                 ))}
               </div>
-            ) : venues.length === 0 ? (
+            ) : (vibeVenues ?? venues).length === 0 ? (
               <div className="text-center py-12">
                 <Search className="w-12 h-12 text-pink-400 mx-auto mb-4 drop-shadow-glow" />
                 <h3 className="text-lg font-semibold mb-2 text-white/80">No venues found</h3>
