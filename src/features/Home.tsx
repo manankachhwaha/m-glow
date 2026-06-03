@@ -50,6 +50,14 @@ export function Home({ onVenueClick, onOpenChat }: HomeProps) {
       // Load favorites
       const favs = await dataSource.getFavorites();
       setFavorites(new Set(favs));
+
+      // Build latest-post-per-venue map so cards show live photos
+      const posts = await dataSource.listTodayPosts();
+      const latest: Record<string, string> = {};
+      for (const post of posts) {
+        if (!latest[post.venue_id]) latest[post.venue_id] = post.media_url;
+      }
+      setLatestPostUrls(latest);
     } catch (error) {
       console.error('Failed to load venues:', error);
     } finally {
@@ -59,6 +67,13 @@ export function Home({ onVenueClick, onOpenChat }: HomeProps) {
 
   useEffect(() => {
     loadVenues();
+  }, [loadVenues]);
+
+  // Refresh when an owner uploads a new photo
+  useEffect(() => {
+    const handler = () => loadVenues();
+    window.addEventListener('venue-post-uploaded', handler);
+    return () => window.removeEventListener('venue-post-uploaded', handler);
   }, [loadVenues]);
 
   // Get user location
