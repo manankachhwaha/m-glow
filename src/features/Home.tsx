@@ -9,6 +9,7 @@ import { LeafletMapView } from '@/components/LeafletMapView';
 import { RealDiscoBall } from '@/components/RealDiscoBall';
 import { useAudio } from '@/hooks/use-audio';
 import type { Venue, CrowdLevel, VenueType, PriceLevel } from '@/data/models';
+import { calculateDistance } from '@/utils/time';
 
 // Real-time features removed for simplification
 
