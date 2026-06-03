@@ -164,7 +164,7 @@ export function GoogleMapView({
     const map = new google.maps.Map(containerRef.current, {
       center: center0,
       zoom: 14,
-      styles: NIGHTCLUB_STYLE as google.maps.MapTypeStyle[],
+      styles: DARK_MAP_STYLE as google.maps.MapTypeStyle[],
       disableDefaultUI: true,
       gestureHandling: 'greedy',
       clickableIcons: false,
