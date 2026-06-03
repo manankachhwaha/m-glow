@@ -21,7 +21,6 @@ interface HomeProps {
 
 export function Home({ onVenueClick, onOpenChat }: HomeProps) {
   const [venues, setVenues] = useState<Venue[]>([]);
-  const [latestPostUrls, setLatestPostUrls] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
