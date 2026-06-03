@@ -58,11 +58,11 @@ export function Home({ onVenueClick }: HomeProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [crowdFilter, typeFilter, priceFilter, searchQuery]);
 
   useEffect(() => {
     loadVenues();
-  }, [crowdFilter, typeFilter, priceFilter, searchQuery]);
+  }, [loadVenues]);
 
   // Get user location
   useEffect(() => {
