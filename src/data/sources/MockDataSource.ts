@@ -349,29 +349,46 @@ export class MockDataSource implements IDataSource {
   }
 
   async createOwnerPost(request: CreatePostRequest): Promise<CreatePostResponse> {
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate processing
-    
-    const postId = `new_${Date.now()}`;
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    const postId = `owner_${Date.now()}`;
     const now = new Date();
     const expiresAt = new Date(now);
     expiresAt.setHours(23, 59, 59, 999);
-    
+
+    const mediaUrl = typeof request.file === 'string'
+      ? request.file
+      : URL.createObjectURL(request.file);
+
     const newPost: Post = {
       id: postId,
       venue_id: request.venue_id,
-      media_url: typeof request.file === 'string' ? request.file : URL.createObjectURL(request.file),
-      thumb_url: typeof request.file === 'string' ? request.file : URL.createObjectURL(request.file),
+      media_url: mediaUrl,
+      thumb_url: mediaUrl,
       media_type: 'image',
       created_at: now.toISOString(),
       expires_at: expiresAt.toISOString(),
       status: 'approved',
       has_faces: true,
       faces_blurred: true,
-      moderation_flag: 'none'
+      moderation_flag: 'none',
     };
-    
+
     SEED_POSTS.unshift(newPost);
-    
+
+    // Persist to IndexedDB so it survives page refresh
+    try {
+      await savePost({
+        id: postId,
+        venue_id: request.venue_id,
+        media_url: mediaUrl,
+        created_at: now.toISOString(),
+        expires_at: expiresAt.toISOString(),
+      });
+    } catch {
+      // IndexedDB unavailable — in-memory only
+    }
+
     return { post_id: postId, status: 'approved' };
   }
 
