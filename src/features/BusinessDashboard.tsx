@@ -18,6 +18,7 @@ export interface OwnerVenue {
   phone: string;
   open_hours: string;
   price_level: PriceLevel;
+  hero_image?: string;
   createdAt: string;
 }
 
