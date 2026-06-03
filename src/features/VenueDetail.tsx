@@ -25,7 +25,7 @@ export function VenueDetail({ venueId, onBack, onOpenChat }: VenueDetailProps) {
     loadVenueDetail();
   }, [venueId]);
 
-  const loadVenueDetail = async () => {
+  const loadVenueDetail = useCallback(async () => {
     setLoading(true);
     try {
       const detail = await dataSource.getVenue(venueId);
