@@ -11,7 +11,31 @@ import { useAudio } from '@/hooks/use-audio';
 import type { Venue, CrowdLevel, VenueType, PriceLevel } from '@/data/models';
 import { calculateDistance } from '@/utils/time';
 
+const GMAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string;
+
 async function reverseGeocode(lat: number, lng: number): Promise<string> {
+  // Try Google Geocoding API first (requires key)
+  if (GMAPS_KEY) {
+    try {
+      const res = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GMAPS_KEY}&result_type=neighborhood|sublocality|locality`
+      );
+      const data = await res.json();
+      if (data.status === 'OK' && data.results?.length > 0) {
+        const comps = data.results[0].address_components as Array<{ long_name: string; types: string[] }>;
+        const neighbourhood = comps.find(c =>
+          c.types.includes('neighborhood') || c.types.includes('sublocality_level_2') || c.types.includes('sublocality')
+        )?.long_name ?? '';
+        const city = comps.find(c =>
+          c.types.includes('locality') || c.types.includes('administrative_area_level_2')
+        )?.long_name ?? '';
+        if (neighbourhood && city) return `${neighbourhood}, ${city}`;
+        if (city) return city;
+        return data.results[0].formatted_address?.split(',')[0] ?? 'your area';
+      }
+    } catch { /* fall through */ }
+  }
+  // Fallback: Nominatim (free, no key needed)
   try {
     const res = await fetch(
       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
@@ -19,11 +43,10 @@ async function reverseGeocode(lat: number, lng: number): Promise<string> {
     );
     const data = await res.json();
     const a = data.address ?? {};
-    const neighbourhood = a.neighbourhood || a.suburb || a.quarter || a.village || a.town || '';
-    const city = a.city || a.county || a.state_district || a.state || '';
-    if (neighbourhood && city) return `${neighbourhood}, ${city}`;
-    if (city) return city;
-    return data.display_name?.split(',')[0] ?? 'your area';
+    const nbhd = a.neighbourhood || a.suburb || a.quarter || a.village || a.town || '';
+    const city = a.city || a.county || a.state || '';
+    if (nbhd && city) return `${nbhd}, ${city}`;
+    return city || 'your area';
   } catch {
     return 'your area';
   }
