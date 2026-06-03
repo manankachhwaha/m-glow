@@ -38,7 +38,7 @@ export function VenueDetail({ venueId, onBack, onOpenChat }: VenueDetailProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [venueId]);
 
   const handleToggleFavorite = async () => {
     try {
