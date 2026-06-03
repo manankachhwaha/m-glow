@@ -374,7 +374,6 @@ export function Home({ onVenueClick, onOpenChat }: HomeProps) {
                   <VenueCard
                     key={venue.id}
                     venue={venue}
-                    latestPostUrl={latestPostUrls[venue.id]}
                     isFavorite={favorites.has(venue.id)}
                     onToggleFavorite={() => handleToggleFavorite(venue.id)}
                     onClick={() => onVenueClick?.(venue.id)}
