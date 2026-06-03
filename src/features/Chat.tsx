@@ -53,7 +53,7 @@ export function Chat({ venueId, venueName, onBack }: ChatProps) {
 
   useEffect(() => {
     initializeChat();
-  }, [venueId]);
+  }, [initializeChat]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
