@@ -59,7 +59,7 @@ export function Chat({ venueId, venueName, onBack }: ChatProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const initializeChat = async () => {
+  const initializeChat = useCallback(async () => {
     try {
       const [detail, faqs] = await Promise.all([
         dataSource.getVenue(venueId),
