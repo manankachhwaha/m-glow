@@ -1,2 +1,2 @@
-// Owner Mode - Simple working version
-export { SimpleOwnerMode as OwnerMode } from './SimpleOwnerMode'; 
+export { SimpleOwnerMode as OwnerMode } from './SimpleOwnerMode';
+export type { } from './SimpleOwnerMode';
