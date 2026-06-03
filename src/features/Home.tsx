@@ -5,7 +5,7 @@ import { Search, MapPin, List, Filter, RefreshCw, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { VenueCard } from '@/ui/VenueCard';
 import { CrowdFilter, TypeFilter, PriceFilter } from '@/ui/FilterChips';
-import { LeafletMapView } from '@/components/LeafletMapView';
+import { GoogleMapView } from '@/components/GoogleMapView';
 import { RealDiscoBall } from '@/components/RealDiscoBall';
 import { useAudio } from '@/hooks/use-audio';
 import type { Venue, CrowdLevel, VenueType, PriceLevel } from '@/data/models';
