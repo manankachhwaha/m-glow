@@ -307,8 +307,14 @@ export function GoogleMapView({
     <div className={cn('relative w-full rounded-3xl overflow-hidden', className)}
       style={{ background: '#212121' }}>
 
-      {/* pac-container needs to float above everything */}
-      <style>{`.pac-container { z-index: 99999 !important; border-radius: 10px; margin-top: 4px; }`}</style>
+      {/* Suppress Google Maps footer UI + float autocomplete dropdown */}
+      <style>{`
+        .pac-container { z-index: 99999 !important; border-radius: 10px; margin-top: 4px; }
+        .gm-style-cc, .gm-style-cc + div { display: none !important; }
+        .gmnoprint, .gm-bundled-control { display: none !important; }
+        a[href^="https://maps.google.com/maps"] { display: none !important; }
+        .gm-style iframe + div { border: none !important; }
+      `}</style>
 
       {/* Map canvas — always rendered so the ref is available */}
       <div ref={containerRef} className="w-full h-full" />
