@@ -15,8 +15,6 @@ const App = () => {
 
   // Handle music toggle with backend-controlled music
   const handleMusicToggle = () => {
-    console.log('🎮 Music button clicked!');
-    console.log('🎮 Current music state:', { isActuallyPlaying, isPaused });
     toggleMusic();
   };
 
