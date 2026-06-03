@@ -7,6 +7,7 @@ import { CrowdBadge, PriceBadge, EleganceBadge } from '@/ui/Badge';
 import type { VenueDetail as VenueDetailType, Post } from '@/data/models';
 
 import { getPostAge } from '@/utils/crowd';
+import { recordVisit } from '@/features/Profile';
 
 import { dataSource } from '@/data/sources';
 
