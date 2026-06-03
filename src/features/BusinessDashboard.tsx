@@ -51,6 +51,7 @@ function AddVenueForm({ onSave, onCancel }: AddVenueFormProps) {
     phone: '',
     open_hours: '',
     price_level: 2 as PriceLevel,
+    hero_image: '' as string,
   });
   const [locating, setLocating] = useState(false);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
