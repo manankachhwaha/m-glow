@@ -168,6 +168,18 @@ function AddVenueForm({ onSave, onCancel }: AddVenueFormProps) {
         </div>
       </div>
 
+      <div>
+        <label className="text-xs text-white/60 mb-1 block">Cover Photo (optional — from gallery)</label>
+        <label className="flex items-center gap-2 px-4 py-3 rounded-xl bg-black/30 border border-white/10 cursor-pointer hover:border-white/20 transition-all">
+          {form.hero_image
+            ? <img src={form.hero_image} alt="cover" className="w-10 h-10 rounded-lg object-cover" />
+            : <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-white/40 text-lg">📷</div>
+          }
+          <span className="text-sm text-white/60">{form.hero_image ? 'Change cover photo' : 'Add cover photo'}</span>
+          <input type="file" accept="image/*" className="hidden" onChange={handleCoverPhoto} />
+        </label>
+      </div>
+
       <button
         onClick={handleSubmit}
         disabled={!form.name.trim() || !form.address.trim()}
