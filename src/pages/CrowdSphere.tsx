@@ -47,6 +47,7 @@ export default function CrowdSphere() {
   }, []);
 
   const handleAuth = () => {
+    localStorage.setItem('auth_session', 'true');
     setIsAuthenticated(true);
     setScreenState({ current: 'home' });
   };
