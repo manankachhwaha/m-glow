@@ -73,6 +73,14 @@ export function Chat({ venueId, venueName, onBack }: ChatProps) {
     }
   }, [venueId]);
 
+  useEffect(() => {
+    initializeChat();
+  }, [initializeChat]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
   const sendMessage = async (text: string) => {
     if (!text.trim() || sending || !venueDetail) return;
 
