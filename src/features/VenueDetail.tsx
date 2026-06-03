@@ -21,10 +21,6 @@ export function VenueDetail({ venueId, onBack, onOpenChat }: VenueDetailProps) {
   const [loading, setLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
 
-  useEffect(() => {
-    loadVenueDetail();
-  }, [loadVenueDetail]);
-
   const loadVenueDetail = useCallback(async () => {
     setLoading(true);
     try {
