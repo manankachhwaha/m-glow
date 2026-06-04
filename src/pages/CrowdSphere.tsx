@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Home as HomeIcon, Zap, MessageSquare, User, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Home } from '@/features/Home';
+import { SupabaseStatus } from '@/components/SupabaseStatus';
 import { VenueDetail } from '@/features/VenueDetail';
 import { LiveFeed } from '@/features/LiveFeed';
 import { Chat } from '@/features/Chat';
