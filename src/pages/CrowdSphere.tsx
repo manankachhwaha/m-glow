@@ -120,6 +120,9 @@ export default function CrowdSphere() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      {/* Supabase connection status — temporary diagnostic */}
+      <SupabaseStatus />
+
       {/* Main content */}
       <div className={cn('pb-safe', showBottomNav && 'pb-20')}>
         {renderScreen()}
